@@ -626,6 +626,30 @@ namespace UnityEditor.iOS.Xcode.PBX
             val.RemoveAll(v => v == value);
         }
 
+        public void RemoveValueList(IEnumerable<string> values)
+        {
+            List<string> valueList = new List<string>(values);
+            if (valueList.Count == 0)
+                return;
+            for (int i = 0; i < val.Count - valueList.Count; i++)
+            {
+                bool match = true;
+                for (int j = 0; j < valueList.Count; j++)
+                {
+                    if (val[i + j] != valueList[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                {
+                    val.RemoveRange(i, valueList.Count);
+                    return;
+                }
+            }
+        }
+
         public static BuildConfigEntryData FromNameValue(string name, string value)
         {
             BuildConfigEntryData ret = new BuildConfigEntryData();
@@ -678,6 +702,12 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             if (entries.ContainsKey(name))
                 entries[name].RemoveValue(EscapeWithQuotesIfNeeded(name, value));
+        }
+
+        public void RemovePropertyValueList(string name, IEnumerable<string> valueList)
+        {
+            if (entries.ContainsKey(name))
+                entries[name].RemoveValueList(valueList);
         }
 
         // name should be either release or debug

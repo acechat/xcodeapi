@@ -1137,6 +1137,26 @@ namespace UnityEditor.iOS.Xcode
                 RemoveBuildPropertyForConfig(guid, name);
         }
 
+        internal void RemoveBuildPropertyValueList(string targetGuid, string name, IEnumerable<string> valueList)
+        {
+            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+                RemoveBuildPropertyValueListForConfig(guid, name, valueList);
+        }
+        internal void RemoveBuildPropertyValueList(IEnumerable<string> targetGuids, string name, IEnumerable<string> valueList)
+        {
+            foreach (string t in targetGuids)
+                RemoveBuildPropertyValueList(t, name, valueList);
+        }
+        internal void RemoveBuildPropertyValueListForConfig(string configGuid, string name, IEnumerable<string> valueList)
+        {
+            buildConfigs[configGuid].RemovePropertyValueList(name, valueList);
+        }
+        internal void RemoveBuildPropertyValueListForConfig(IEnumerable<string> configGuids, string name, IEnumerable<string> valueList)
+        {
+            foreach (string guid in configGuids)
+                RemoveBuildPropertyValueListForConfig(guid, name, valueList);
+        }
+
         /// Interprets the value of the given property as a set of space-delimited strings, then
         /// removes strings equal to items to removeValues and adds strings in addValues.
         public void UpdateBuildProperty(string targetGuid, string name, 
