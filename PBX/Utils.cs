@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
@@ -37,6 +38,18 @@ namespace UnityEditor.iOS.Xcode.PBX
                 return guid;
             return String.Format("{0} /* {1} */", guid, comment);
         }
+
+        public void WriteStringBuilder(StringBuilder sb, string guid)
+        {
+            string comment = this[guid];
+            if (comment == null)
+                sb.Append(guid);
+            else
+            {
+                // {0} /* {1} */
+                sb.Append(guid).Append(" /* ").Append(comment).Append(" */");
+            }
+        }
     }
 
     internal class PBXGUID
@@ -66,17 +79,42 @@ namespace UnityEditor.iOS.Xcode.PBX
     internal class PBXRegex
     {
         public static string GuidRegexString = "[A-Fa-f0-9]{24}";
-        public static Regex DontNeedQuotes  = new Regex("^[\\w\\d\\./_*]+$");
     }
 
     internal class PBXStream
     {
+        static bool DontNeedQuotes(string src)
+        {
+            // using a regex instead of explicit matching slows down common cases by 40%
+            if (src.Length == 0)
+                return false;
+
+            bool hasSlash = false;
+            for (int i = 0; i < src.Length; ++i)
+            {
+                char c = src[i];
+                if (Char.IsLetterOrDigit(c) || c == '.' || c == '*' || c == '_')
+                    continue;
+                if (c == '/')
+                {
+                    hasSlash = true;
+                    continue;
+                }
+                return false;
+            }
+            if (hasSlash)
+            {
+                if (src.Contains("//") || src.Contains("/*") || src.Contains("*/"))
+                    return false;
+            }
+            return true;
+        }
+  
         // Quotes the given string if it contains special characters. Note: if the string already
         // contains quotes, then they are escaped and the entire string quoted again
         public static string QuoteStringIfNeeded(string src)
         {
-            if (PBXRegex.DontNeedQuotes.IsMatch(src) && 
-                !src.Contains("//") && !src.Contains("/*") && !src.Contains("*/"))
+            if (DontNeedQuotes(src))
                 return src;
             return "\"" + src.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
         }
@@ -156,7 +194,8 @@ namespace UnityEditor.iOS.Xcode.PBX
             { ".strings",   new FileTypeDesc("text.plist.strings",      PBXFileType.Resource) },
             { ".storyboard",new FileTypeDesc("file.storyboard",         PBXFileType.Resource) },
             { ".bundle",    new FileTypeDesc("wrapper.plug-in",         PBXFileType.Resource) },
-            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) }
+            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) },
+            { ".dat",       new FileTypeDesc("file",                    PBXFileType.NotBuildable) }
         };
 
         public static bool IsKnownExtension(string ext)
@@ -173,21 +212,27 @@ namespace UnityEditor.iOS.Xcode.PBX
 
         public static PBXFileType GetFileType(string ext)
         {
-            if (types.ContainsKey(ext))
-                return types[ext].type;
-            return PBXFileType.NotBuildable;
+            if (!types.ContainsKey(ext))
+                return PBXFileType.Resource;
+            return types[ext].type;
         }
 
         public static string GetTypeName(string ext)
         {
             if (types.ContainsKey(ext))
                 return types[ext].name;
-            return "text";
+            // Xcode actually checks the file contents to determine the file type.
+            // Text files have "text" type and all other files have "file" type.
+            // Since we can't reasonably determine whether the file in question is
+            // a text file, we just take the safe route and return "file" type.
+            return "file";
         }
 
         public static bool IsBuildable(string ext)
         {
-            if (types.ContainsKey(ext) && types[ext].type != PBXFileType.NotBuildable)
+            if (!types.ContainsKey(ext))
+                return true;
+            if (types[ext].type != PBXFileType.NotBuildable)
                 return true;
             return false;
         }
@@ -229,6 +274,64 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             return new List<PBXSourceTree>{PBXSourceTree.Absolute, PBXSourceTree.Build,
                                            PBXSourceTree.Developer, PBXSourceTree.Sdk, PBXSourceTree.Source};
+        }
+    }
+    
+    internal class Utils
+    {
+        /// Replaces '\' with '/'. We need to apply this function to all paths that come from the user
+        /// of the API because we store paths to pbxproj and on windows we may get path with '\' slashes
+        /// instead of '/' slashes
+        public static string FixSlashesInPath(string path)
+        {
+            if (path == null)
+                return null;
+            return path.Replace('\\', '/');
+        }
+
+        public static void CombinePaths(string path1, PBXSourceTree tree1, string path2, PBXSourceTree tree2,
+                                 out string resPath, out PBXSourceTree resTree)
+        {
+            if (tree2 == PBXSourceTree.Group)
+            {
+                resPath = CombinePaths(path1, path2);
+                resTree = tree1;
+                return;
+            }
+            
+            resPath = path2;
+            resTree = tree2;
+        }
+        
+        public static string CombinePaths(string path1, string path2)
+        {
+            if (path2.StartsWith("/"))
+                return path2;
+            if (path1.EndsWith("/"))
+                return path1 + path2;
+            if (path1 == "")
+                return path2;
+            if (path2 == "")
+                return path1;
+            return path1 + "/" + path2;
+        }
+        
+        public static string GetDirectoryFromPath(string path)
+        {
+            int pos = path.LastIndexOf('/');
+            if (pos == -1)
+                return "";
+            else
+                return path.Substring(0, pos);
+        }
+        
+        public static string GetFilenameFromPath(string path)
+        {
+            int pos = path.LastIndexOf('/');
+            if (pos == -1)
+                return path;
+            else
+                return path.Substring(pos + 1);
         }
     }
 

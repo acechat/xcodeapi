@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,13 +20,28 @@ namespace UnityEditor.iOS.Xcode.PBX
     // known section: contains objects that we care about
     internal class KnownSectionBase<T> : SectionBase where T : PBXObject, new()
     {
-        public SortedDictionary<string, T> entries = new SortedDictionary<string, T>();
+        private Dictionary<string, T> m_Entries = new Dictionary<string, T>();
 
         private string m_Name;
 
         public KnownSectionBase(string sectionName)
         {
             m_Name = sectionName;
+        }
+ 
+        public IEnumerable<KeyValuePair<string, T>> GetEntries()
+        { 
+            return m_Entries; 
+        }
+
+        public IEnumerable<string> GetGuids()
+        {
+            return m_Entries.Keys;
+        }
+        
+        public IEnumerable<T> GetObjects()
+        {
+            return m_Entries.Values;
         }
 
         public override void AddObject(string key, PBXElementDict value)
@@ -34,19 +50,24 @@ namespace UnityEditor.iOS.Xcode.PBX
             obj.guid = key;
             obj.SetPropertiesWhenSerializing(value);
             obj.UpdateVars();
-            entries[obj.guid] = obj;
+            m_Entries[obj.guid] = obj;
         }
 
         public override void WriteSection(StringBuilder sb, GUIDToCommentMap comments)
         {
-            if (entries.Count == 0)
+            if (m_Entries.Count == 0)
                 return;            // do not write empty sections
 
             sb.AppendFormat("\n\n/* Begin {0} section */", m_Name);
-            foreach (T obj in entries.Values)
+            var keys = new List<string>(m_Entries.Keys);
+            keys.Sort(StringComparer.Ordinal);
+            foreach (string key in keys)
             {
+                T obj = m_Entries[key];
                 obj.UpdateProps();
-                sb.AppendFormat("\n\t\t{0} = ", comments.Write(obj.guid));
+                sb.Append("\n\t\t");
+                comments.WriteStringBuilder(sb, obj.guid);
+                sb.Append(" = ");
                 Serializer.WriteDict(sb, obj.GetPropertiesWhenSerializing(), 2, 
                                      obj.shouldCompact, obj.checker, comments);
                 sb.Append(";");
@@ -54,24 +75,30 @@ namespace UnityEditor.iOS.Xcode.PBX
             sb.AppendFormat("\n/* End {0} section */", m_Name);
         }
 
+        // returns null if not found
         public T this[string guid]
         {
             get {
-                if (entries.ContainsKey(guid))
-                    return entries[guid];
+                if (m_Entries.ContainsKey(guid))
+                    return m_Entries[guid];
                 return null;
             }
         }
+        
+        public bool HasEntry(string guid)
+        {
+            return m_Entries.ContainsKey(guid);
+        }      
 
         public void AddEntry(T obj)
         {
-            entries[obj.guid] = obj;
+            m_Entries[obj.guid] = obj;
         }
 
         public void RemoveEntry(string guid)
         {
-            if (entries.ContainsKey(guid))
-                entries.Remove(guid);
+            if (m_Entries.ContainsKey(guid))
+                m_Entries.Remove(guid);
         }
     }
 
@@ -85,7 +112,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         public PBXProjectObject project
         {
             get {
-                foreach (var kv in entries)
+                foreach (var kv in GetEntries())
                     return kv.Value;
                 return null;
             }

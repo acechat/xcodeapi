@@ -170,7 +170,7 @@ namespace UnityEditor.iOS.Xcode
                     new XDocument(new XDeclaration("1.0", "utf-8", null),
                                   new XDocumentType(doc.DocumentType.Name, doc.DocumentType.PublicId, doc.DocumentType.SystemId, null),
                                   new XElement(doc.Root.Name));
-                return "" + tmpDoc.Declaration + Environment.NewLine + tmpDoc.DocumentType + Environment.NewLine + doc.Root;
+                return "" + tmpDoc.Declaration + "\n" + tmpDoc.DocumentType + "\n" + doc.Root;
             }
             else
             {

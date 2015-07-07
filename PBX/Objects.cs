@@ -8,103 +8,6 @@ using System;
 
 namespace UnityEditor.iOS.Xcode.PBX
 {
-    
-    class PBXElement
-    {
-        protected PBXElement() {}
-        
-        // convenience methods
-        public string AsString() { return ((PBXElementString)this).value; }
-        public PBXElementArray AsArray() { return (PBXElementArray)this; }
-        public PBXElementDict AsDict()   { return (PBXElementDict)this; }
-        
-        public PBXElement this[string key]
-        {
-            get { return AsDict()[key]; }
-            set { AsDict()[key] = value; }
-        }
-    }
-    
-    class PBXElementString : PBXElement
-    {
-        public PBXElementString(string v) { value = v; }
-        
-        public string value;
-    }
-
-    class PBXElementDict : PBXElement
-    {
-        public PBXElementDict() : base() {}
-        
-        private SortedDictionary<string, PBXElement> m_PrivateValue = new SortedDictionary<string, PBXElement>();
-        public IDictionary<string, PBXElement> values { get { return m_PrivateValue; }}
-        
-        new public PBXElement this[string key]
-        {
-            get {
-                if (values.ContainsKey(key))
-                    return values[key];
-                return null;
-            }
-            set { this.values[key] = value; }
-        }
-        
-        public bool Contains(string key)
-        {
-            return values.ContainsKey(key);
-        }
-        
-        public void Remove(string key)
-        {
-            values.Remove(key);
-        }
-
-        public void SetString(string key, string val)
-        {
-            values[key] = new PBXElementString(val);
-        }
-        
-        public PBXElementArray CreateArray(string key)
-        {
-            var v = new PBXElementArray();
-            values[key] = v;
-            return v;
-        }
-        
-        public PBXElementDict CreateDict(string key)
-        {
-            var v = new PBXElementDict();
-            values[key] = v;
-            return v;
-        }
-    }
-    
-    class PBXElementArray : PBXElement
-    {
-        public PBXElementArray() : base() {}
-        public List<PBXElement> values = new List<PBXElement>();
-        
-        // convenience methods
-        public void AddString(string val)
-        {
-            values.Add(new PBXElementString(val));
-        }
-        
-        public PBXElementArray AddArray()
-        {
-            var v = new PBXElementArray();
-            values.Add(v);
-            return v;
-        }
-        
-        public PBXElementDict AddDict()
-        {
-            var v = new PBXElementDict();
-            values.Add(v);
-            return v;
-        }
-    }
-
     internal class PBXObject
     {   
         public string guid;
@@ -193,7 +96,14 @@ namespace UnityEditor.iOS.Xcode.PBX
             buildFile.weak = weak;
             return buildFile;
         }
-        
+
+        PBXElementDict GetSettingsDictOptional()
+        {
+            if (m_Properties.Contains("settings"))
+                return m_Properties["settings"].AsDict();
+            return null;
+        }
+
         PBXElementDict GetSettingsDict()
         {
             if (m_Properties.Contains("settings"))
@@ -209,6 +119,13 @@ namespace UnityEditor.iOS.Xcode.PBX
             {
                 GetSettingsDict().SetString("COMPILER_FLAGS", compileFlags);
             }
+            else
+            {
+                var dict = GetSettingsDictOptional();
+                if (dict != null)
+                    dict.Remove("COMPILER_FLAGS");
+            }
+
             if (weak)
             {
                 var dict = GetSettingsDict();
@@ -226,6 +143,19 @@ namespace UnityEditor.iOS.Xcode.PBX
                 }
                 if (!exists)
                     attrs.AddString("Weak");
+            }
+            else
+            {
+                var dict = GetSettingsDictOptional();
+                if (dict != null && dict.Contains("ATTRIBUTES"))
+                {
+                    var attrs = dict["ATTRIBUTES"].AsArray();
+                    attrs.values.RemoveAll(el => (el is PBXElementString && el.AsString() == "Weak"));
+                    if (attrs.values.Count == 0)
+                        dict.Remove("ATTRIBUTES");
+                    if (dict.values.Count == 0)
+                        m_Properties.Remove("settings");
+                }
             }
         }
 
@@ -255,7 +185,16 @@ namespace UnityEditor.iOS.Xcode.PBX
     
     internal class PBXFileReference : PBXObject
     {
-        public string path;
+        string m_Path = null;
+        string m_ExplicitFileType = null;
+        string m_LastKnownFileType = null;
+        
+        public string path 
+        { 
+            get { return m_Path; } 
+            set { m_ExplicitFileType = null; m_LastKnownFileType = null; m_Path = value; } 
+        }
+
         public string name;
         public PBXSourceTree tree;
         
@@ -278,36 +217,46 @@ namespace UnityEditor.iOS.Xcode.PBX
         public override void UpdateProps()
         {
             string ext = null;
-            if (name != null) 
-                ext = Path.GetExtension(name);
-            else if (path != null)
-                ext = Path.GetExtension(path);
-            if (ext != null)
+            if (m_ExplicitFileType != null)
+                SetPropertyString("explicitFileType", m_ExplicitFileType);
+            else if (m_LastKnownFileType != null)
+                SetPropertyString("lastKnownFileType", m_LastKnownFileType);
+            else
             {
-                if (FileTypeUtils.IsFileTypeExplicit(ext))
-                    SetPropertyString("explicitFileType", FileTypeUtils.GetTypeName(ext));
-                else
-                    SetPropertyString("lastKnownFileType", FileTypeUtils.GetTypeName(ext));
+                if (name != null) 
+                    ext = Path.GetExtension(name);
+                else if (m_Path != null)
+                    ext = Path.GetExtension(m_Path);
+                if (ext != null)
+                {
+                    if (FileTypeUtils.IsFileTypeExplicit(ext))
+                        SetPropertyString("explicitFileType", FileTypeUtils.GetTypeName(ext));
+                    else
+                        SetPropertyString("lastKnownFileType", FileTypeUtils.GetTypeName(ext));
+                }
             }
-            if (path == name)
+            if (m_Path == name)
                 SetPropertyString("name", null);
             else
                 SetPropertyString("name", name);
-            if (path == null)
+            if (m_Path == null)
                 SetPropertyString("path", "");
             else
-                SetPropertyString("path", path);
+                SetPropertyString("path", m_Path);
             SetPropertyString("sourceTree", FileTypeUtils.SourceTreeDesc(tree));
         }
+
         public override void UpdateVars()
         {
             name = GetPropertyString("name");
-            path = GetPropertyString("path");
+            m_Path = GetPropertyString("path");
             if (name == null)
-                name = path;
-            if (path == null)
-                path = "";
+                name = m_Path;
+            if (m_Path == null)
+                m_Path = "";
             tree = FileTypeUtils.ParseSourceTree(GetPropertyString("sourceTree"));
+            m_ExplicitFileType = GetPropertyString("explicitFileType");
+            m_LastKnownFileType = GetPropertyString("lastKnownFileType");
         }
     }
 
@@ -613,6 +562,11 @@ namespace UnityEditor.iOS.Xcode.PBX
             if (!val.Contains(value))
                 val.Add(value);
         }
+        
+        public void RemoveValue(string value)
+        {
+            val.RemoveAll(v => v == value);
+        }
 
         public static BuildConfigEntry FromNameValue(string name, string value)
         {
@@ -654,25 +608,17 @@ namespace UnityEditor.iOS.Xcode.PBX
             else
                 SetProperty(name, value);
         }
-
-        public void UpdateProperties(string name, string[] addValues, string[] removeValues)
+        
+        public void RemoveProperty(string name)
         {
             if (entries.ContainsKey(name))
-            {
-                HashSet<string> valSet = new HashSet<string>(entries[name].val);
-                
-                if (removeValues != null)
-                {
-                    foreach (string val in removeValues)
-                        valSet.Remove(EscapeWithQuotesIfNeeded(name, val));
-                }
-                if (addValues != null)
-                {
-                    foreach (string val in addValues)
-                        valSet.Add(EscapeWithQuotesIfNeeded(name, val));
-                }
-                entries[name].val = new List<string>(valSet);
-            }
+                entries.Remove(name);
+        }
+
+        public void RemovePropertyValue(string name, string value)
+        {
+            if (entries.ContainsKey(name))
+                entries[name].RemoveValue(EscapeWithQuotesIfNeeded(name, value));
         }
 
         // name should be either release or debug

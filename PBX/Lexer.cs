@@ -209,7 +209,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         bool IsOperator(char ch)
         {
-            if (";,=(){}".Contains(ch))
+            if (ch == ';' || ch == ',' || ch == '=' || ch == '(' || ch == ')' || ch == '{' || ch == '}')
                 return true;
             return false;
         }

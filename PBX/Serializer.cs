@@ -174,7 +174,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         static void WriteStringImpl(StringBuilder sb, string s, bool comment, GUIDToCommentMap comments)
         {
             if (comment)
-                sb.Append(comments.Write(s));
+                comments.WriteStringBuilder(sb, s);
             else
                 sb.Append(PBXStream.QuoteStringIfNeeded(s));
         }
@@ -208,7 +208,9 @@ namespace UnityEditor.iOS.Xcode.PBX
             
             if (el.Contains("isa"))
                 WriteDictKeyValue(sb, "isa", el["isa"], indent+1, compact, checker, comments);
-            foreach (var key in el.values.Keys)
+            var keys = new List<string>(el.values.Keys);
+            keys.Sort(StringComparer.Ordinal);
+            foreach (var key in keys)
             {
                 if (key != "isa")
                     WriteDictKeyValue(sb, key, el[key], indent+1, compact, checker, comments);
