@@ -470,7 +470,13 @@ namespace UnityEditor.iOS.Xcode
             foreach (DataSetVariant item in m_Variants)
             {
                 var filename = Path.GetFileName(item.path);
-                File.Copy(item.path, Path.Combine(m_Path, filename));
+                if (!File.Exists(item.path))
+                {
+                    if (warnings != null)
+                        warnings.Add("File not found: " + item.path);
+                }
+                else
+                    File.Copy(item.path, Path.Combine(m_Path, filename));
 
                 var docItem = data.AddDict();
                 docItem.SetString("filename", filename);
@@ -602,7 +608,13 @@ namespace UnityEditor.iOS.Xcode
             foreach (ImageSetVariant item in m_Variants)
             {
                 var filename = Path.GetFileName(item.path);
-                File.Copy(item.path, Path.Combine(m_Path, filename));
+                if (!File.Exists(item.path))
+                {
+                    if (warnings != null)
+                        warnings.Add("File not found: " + item.path);
+                }
+                else
+                    File.Copy(item.path, Path.Combine(m_Path, filename));
 
                 var docItem = images.AddDict();
                 docItem.SetString("filename", filename);
