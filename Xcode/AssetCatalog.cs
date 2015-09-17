@@ -189,9 +189,9 @@ namespace UnityEditor.iOS.Xcode
             return folder;
         }
 
-        public void Write()
+        public void Write(List<string> warnings = null)
         {
-            m_Root.Write();
+            m_Root.Write(warnings);
         }
     }
 
@@ -221,7 +221,7 @@ namespace UnityEditor.iOS.Xcode
             return info;
         }
 
-        public abstract void Write();
+        public abstract void Write(List<string> warnings);
     }
 
     internal class AssetFolder : AssetCatalogItem
@@ -341,7 +341,7 @@ namespace UnityEditor.iOS.Xcode
             doc.WriteToFile(Path.Combine(m_Path, "Contents.json"));
         }
 
-        public override void Write()
+        public override void Write(List<string> warnings)
         {
             if (Directory.Exists(m_Path))
                 Directory.Delete(m_Path, true); // ensure we start from clean state
@@ -349,7 +349,7 @@ namespace UnityEditor.iOS.Xcode
             WriteJson();
 
             foreach (var item in m_Items)
-                item.Write();
+                item.Write(warnings);
         }
     }
 
@@ -456,7 +456,7 @@ namespace UnityEditor.iOS.Xcode
             AddVariant(new DataSetVariant(requirement, path, typeIdentifier));
         }
 
-        public override void Write()
+        public override void Write(List<string> warnings)
         {
             Directory.CreateDirectory(m_Path);
 
@@ -590,7 +590,7 @@ namespace UnityEditor.iOS.Xcode
             docInsets.SetInteger("right", resizing.right);
         }
 
-        public override void Write()
+        public override void Write(List<string> warnings)
         {
             Directory.CreateDirectory(m_Path);
             var doc = new JsonDocument();
@@ -645,7 +645,7 @@ namespace UnityEditor.iOS.Xcode
             return m_Imageset;
         }
 
-        public override void Write()
+        public override void Write(List<string> warnings)
         {
             Directory.CreateDirectory(m_Path);
             var doc = new JsonDocument();
@@ -660,7 +660,7 @@ namespace UnityEditor.iOS.Xcode
                 reference.SetString("matching-style", "fully-qualified-name");
             }
             if (m_Imageset != null)
-                m_Imageset.Write();
+                m_Imageset.Write(warnings);
 
             doc.WriteToFile(Path.Combine(m_Path, "Contents.json"));
         }
@@ -687,7 +687,7 @@ namespace UnityEditor.iOS.Xcode
             return newLayer;
         }
 
-        public override void Write()
+        public override void Write(List<string> warnings)
         {
             Directory.CreateDirectory(m_Path);
             var doc = new JsonDocument();
@@ -696,7 +696,7 @@ namespace UnityEditor.iOS.Xcode
             var docLayers = doc.root.CreateArray("layers");
             foreach (var layer in m_Layers)
             {
-                layer.Write();
+                layer.Write(warnings);
  
                 var docLayer = docLayers.AddDict();
                 docLayer.SetString("filename", Path.GetFileName(layer.path));
