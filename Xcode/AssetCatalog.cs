@@ -189,7 +189,12 @@ namespace UnityEditor.iOS.Xcode
             return folder;
         }
 
-        public void Write(List<string> warnings = null)
+        public void Write()
+        {
+            Write(null);
+        }
+
+        public void Write(List<string> warnings)
         {
             m_Root.Write(warnings);
         }
