@@ -8,7 +8,7 @@ using System;
 
 namespace UnityEditor.iOS.Xcode.PBX
 {
-    internal class PBXObject
+    internal class PBXObjectData
     {   
         public string guid;
         protected PBXElementDict m_Properties = new PBXElementDict();
@@ -73,11 +73,12 @@ namespace UnityEditor.iOS.Xcode.PBX
         public virtual void UpdateVars() {}       // Updates the cached variables from underlying props
     }
     
-    internal class PBXBuildFile : PBXObject
+    internal class PBXBuildFileData : PBXObjectData
     {
         public string fileRef;
         public string compileFlags;
         public bool weak;
+        public List<string> assetTags;
         
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "fileRef/*"
@@ -85,55 +86,48 @@ namespace UnityEditor.iOS.Xcode.PBX
         internal override PropertyCommentChecker checker { get { return checkerData; } }
         internal override bool shouldCompact { get { return true; } }
         
-        public static PBXBuildFile CreateFromFile(string fileRefGUID, bool weak,
-                                                  string compileFlags)
+        public static PBXBuildFileData CreateFromFile(string fileRefGUID, bool weak,
+                                                      string compileFlags)
         {
-            PBXBuildFile buildFile = new PBXBuildFile();
+            PBXBuildFileData buildFile = new PBXBuildFileData();
             buildFile.guid = PBXGUID.Generate();
             buildFile.SetPropertyString("isa", "PBXBuildFile");
             buildFile.fileRef = fileRefGUID;
             buildFile.compileFlags = compileFlags;
             buildFile.weak = weak;
+            buildFile.assetTags = new List<string>();
             return buildFile;
-        }
-
-        PBXElementDict GetSettingsDictOptional()
-        {
-            if (m_Properties.Contains("settings"))
-                return m_Properties["settings"].AsDict();
-            return null;
-        }
-
-        PBXElementDict GetSettingsDict()
-        {
-            if (m_Properties.Contains("settings"))
-                return m_Properties["settings"].AsDict();
-            else
-                return m_Properties.CreateDict("settings");        
         }
         
         public override void UpdateProps()
         {
             SetPropertyString("fileRef", fileRef);
+
+            PBXElementDict settings = null;
+            if (m_Properties.Contains("settings"))
+                settings = m_Properties["settings"].AsDict();
+            
             if (compileFlags != null && compileFlags != "")
             {
-                GetSettingsDict().SetString("COMPILER_FLAGS", compileFlags);
+                if (settings == null)
+                    settings = m_Properties.CreateDict("settings");
+                settings.SetString("COMPILER_FLAGS", compileFlags);
             }
             else
             {
-                var dict = GetSettingsDictOptional();
-                if (dict != null)
-                    dict.Remove("COMPILER_FLAGS");
+                if (settings != null)
+                    settings.Remove("COMPILER_FLAGS");
             }
 
             if (weak)
             {
-                var dict = GetSettingsDict();
+                if (settings == null)
+                    settings = m_Properties.CreateDict("settings");
                 PBXElementArray attrs = null;
-                if (dict.Contains("ATTRIBUTES"))
-                    attrs = dict["ATTRIBUTES"].AsArray();
+                if (settings.Contains("ATTRIBUTES"))
+                    attrs = settings["ATTRIBUTES"].AsArray();
                 else
-                    attrs = dict.CreateArray("ATTRIBUTES");
+                    attrs = settings.CreateArray("ATTRIBUTES");
                     
                 bool exists = false;
                 foreach (var value in attrs.values)
@@ -146,17 +140,31 @@ namespace UnityEditor.iOS.Xcode.PBX
             }
             else
             {
-                var dict = GetSettingsDictOptional();
-                if (dict != null && dict.Contains("ATTRIBUTES"))
+                if (settings != null && settings.Contains("ATTRIBUTES"))
                 {
-                    var attrs = dict["ATTRIBUTES"].AsArray();
+                    var attrs = settings["ATTRIBUTES"].AsArray();
                     attrs.values.RemoveAll(el => (el is PBXElementString && el.AsString() == "Weak"));
                     if (attrs.values.Count == 0)
-                        dict.Remove("ATTRIBUTES");
-                    if (dict.values.Count == 0)
-                        m_Properties.Remove("settings");
+                        settings.Remove("ATTRIBUTES");
                 }
             }
+            
+            if (assetTags.Count > 0)
+            {
+                if (settings == null)
+                    settings = m_Properties.CreateDict("settings");
+                var tagsArray = settings.CreateArray("ASSET_TAGS");
+                foreach (string tag in assetTags)
+                    tagsArray.AddString(tag);
+            }
+            else
+            {
+                if (settings != null)
+                    settings.Remove("ASSET_TAGS");
+            }
+            
+            if (settings != null && settings.values.Count == 0)
+                m_Properties.Remove("settings");
         }
 
         public override void UpdateVars()
@@ -164,6 +172,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             fileRef = GetPropertyString("fileRef");
             compileFlags = null;
             weak = false;
+            assetTags = new List<string>();
             if (m_Properties.Contains("settings"))
             {
                 var dict = m_Properties["settings"].AsDict();
@@ -179,11 +188,17 @@ namespace UnityEditor.iOS.Xcode.PBX
                             weak = true;
                     }
                 }
+                if (dict.Contains("ASSET_TAGS"))
+                {
+                    var tags = dict["ASSET_TAGS"].AsArray();
+                    foreach (var value in tags.values)
+                        assetTags.Add(value.AsString());
+                }
             }
         }
     }
     
-    internal class PBXFileReference : PBXObject
+    internal class PBXFileReferenceData : PBXObjectData
     {
         string m_Path = null;
         string m_ExplicitFileType = null;
@@ -197,20 +212,32 @@ namespace UnityEditor.iOS.Xcode.PBX
 
         public string name;
         public PBXSourceTree tree;
+        public bool isFolderReference 
+        { 
+            get { return m_LastKnownFileType != null && m_LastKnownFileType == "folder"; } 
+        }
         
         internal override bool shouldCompact { get { return true; } }
         
-        public static PBXFileReference CreateFromFile(string path, string projectFileName,
-                                                      PBXSourceTree tree)
+        public static PBXFileReferenceData CreateFromFile(string path, string projectFileName,
+                                                          PBXSourceTree tree)
         {
             string guid = PBXGUID.Generate();
             
-            PBXFileReference fileRef = new PBXFileReference();
+            PBXFileReferenceData fileRef = new PBXFileReferenceData();
             fileRef.SetPropertyString("isa", "PBXFileReference");
             fileRef.guid = guid;
             fileRef.path = path;
             fileRef.name = projectFileName;
             fileRef.tree = tree;
+            return fileRef;
+        }
+        
+        public static PBXFileReferenceData CreateFromFolderReference(string path, string projectFileName,
+                                                                     PBXSourceTree tree)
+        {
+            var fileRef = CreateFromFile(path, projectFileName, tree);
+            fileRef.m_LastKnownFileType = "folder";
             return fileRef;
         }
         
@@ -282,7 +309,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         IEnumerator IEnumerable.GetEnumerator() { return m_List.GetEnumerator(); }
     }
 
-    internal class XCConfigurationList : PBXObject
+    internal class XCConfigurationListData : PBXObjectData
     {
         public GUIDList buildConfigs;
 
@@ -291,9 +318,9 @@ namespace UnityEditor.iOS.Xcode.PBX
         });
         internal override PropertyCommentChecker checker { get { return checkerData; } }
         
-        public static XCConfigurationList Create()
+        public static XCConfigurationListData Create()
         {
-            var res = new XCConfigurationList();
+            var res = new XCConfigurationListData();
             res.guid = PBXGUID.Generate();
 
             res.SetPropertyString("isa", "XCConfigurationList");
@@ -313,7 +340,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXGroup : PBXObject
+    internal class PBXGroupData : PBXObjectData
     {
         public GUIDList children;
         public PBXSourceTree tree; 
@@ -325,12 +352,12 @@ namespace UnityEditor.iOS.Xcode.PBX
         internal override PropertyCommentChecker checker { get { return checkerData; } }
 
         // name must not contain '/'
-        public static PBXGroup Create(string name, string path, PBXSourceTree tree)
+        public static PBXGroupData Create(string name, string path, PBXSourceTree tree)
         {
             if (name.Contains("/"))
                 throw new Exception("Group name must not contain '/'");
 
-            PBXGroup gr = new PBXGroup();
+            PBXGroupData gr = new PBXGroupData();
             gr.guid = PBXGUID.Generate();
             gr.SetPropertyString("isa", "PBXGroup");
             gr.name = name;
@@ -341,7 +368,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             return gr;
         }
         
-        public static PBXGroup CreateRelative(string name)
+        public static PBXGroupData CreateRelative(string name)
         {
             return Create(name, name, PBXSourceTree.Group);
         }
@@ -373,11 +400,11 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXVariantGroup : PBXGroup
+    internal class PBXVariantGroupData : PBXGroupData
     {
     }
 
-    internal class PBXNativeTarget : PBXObject
+    internal class PBXNativeTargetData : PBXObjectData
     {
         public GUIDList phases;
 
@@ -395,9 +422,10 @@ namespace UnityEditor.iOS.Xcode.PBX
 
         internal override PropertyCommentChecker checker { get { return checkerData; } }
         
-        public static PBXNativeTarget Create(string name, string productRef, string productType, string buildConfigList)
+        public static PBXNativeTargetData Create(string name, string productRef, 
+                                                 string productType, string buildConfigList)
         {
-            var res = new PBXNativeTarget();
+            var res = new PBXNativeTargetData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXNativeTarget");
             res.buildConfigList = buildConfigList;
@@ -428,7 +456,7 @@ namespace UnityEditor.iOS.Xcode.PBX
     }
 
 
-    internal class FileGUIDListBase : PBXObject
+    internal class FileGUIDListBase : PBXObjectData
     {
         public GUIDList files;
  
@@ -448,11 +476,11 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXSourcesBuildPhase : FileGUIDListBase
+    internal class PBXSourcesBuildPhaseData : FileGUIDListBase
     {
-        public static PBXSourcesBuildPhase Create()
+        public static PBXSourcesBuildPhaseData Create()
         {
-            var res = new PBXSourcesBuildPhase();
+            var res = new PBXSourcesBuildPhaseData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXSourcesBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
@@ -462,11 +490,11 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXFrameworksBuildPhase : FileGUIDListBase
+    internal class PBXFrameworksBuildPhaseData : FileGUIDListBase
     {
-        public static PBXFrameworksBuildPhase Create()
+        public static PBXFrameworksBuildPhaseData Create()
         {
-            var res = new PBXFrameworksBuildPhase();
+            var res = new PBXFrameworksBuildPhaseData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXFrameworksBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
@@ -476,11 +504,11 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXResourcesBuildPhase : FileGUIDListBase
+    internal class PBXResourcesBuildPhaseData : FileGUIDListBase
     {
-        public static PBXResourcesBuildPhase Create()
+        public static PBXResourcesBuildPhaseData Create()
         {
-            var res = new PBXResourcesBuildPhase();
+            var res = new PBXResourcesBuildPhaseData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXResourcesBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
@@ -490,7 +518,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXCopyFilesBuildPhase : FileGUIDListBase
+    internal class PBXCopyFilesBuildPhaseData : FileGUIDListBase
     {
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "files/*",
@@ -501,9 +529,9 @@ namespace UnityEditor.iOS.Xcode.PBX
         public string name;
 
         // name may be null
-        public static PBXCopyFilesBuildPhase Create(string name, string subfolderSpec)
+        public static PBXCopyFilesBuildPhaseData Create(string name, string subfolderSpec)
         {
-            var res = new PBXCopyFilesBuildPhase();
+            var res = new PBXCopyFilesBuildPhaseData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXCopyFilesBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
@@ -527,7 +555,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXShellScriptBuildPhase : PBXObject
+    internal class PBXShellScriptBuildPhaseData : PBXObjectData
     {
         public GUIDList files;
 
@@ -547,7 +575,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class BuildConfigEntry
+    internal class BuildConfigEntryData
     {
         public string name;
         public List<string> val = new List<string>();
@@ -568,18 +596,18 @@ namespace UnityEditor.iOS.Xcode.PBX
             val.RemoveAll(v => v == value);
         }
 
-        public static BuildConfigEntry FromNameValue(string name, string value)
+        public static BuildConfigEntryData FromNameValue(string name, string value)
         {
-            BuildConfigEntry ret = new BuildConfigEntry();
+            BuildConfigEntryData ret = new BuildConfigEntryData();
             ret.name = name;
             ret.AddValue(value);
             return ret;
         }
     }
 
-    internal class XCBuildConfiguration : PBXObject
+    internal class XCBuildConfigurationData : PBXObjectData
     {
-        protected SortedDictionary<string, BuildConfigEntry> entries = new SortedDictionary<string, BuildConfigEntry>();
+        protected SortedDictionary<string, BuildConfigEntryData> entries = new SortedDictionary<string, BuildConfigEntryData>();
         public string name { get { return GetPropertyString("name"); } }
 
         // Note that QuoteStringIfNeeded does its own escaping. Double-escaping with quotes is
@@ -598,7 +626,7 @@ namespace UnityEditor.iOS.Xcode.PBX
 
         public void SetProperty(string name, string value)
         {
-            entries[name] = BuildConfigEntry.FromNameValue(name, EscapeWithQuotesIfNeeded(name, value));
+            entries[name] = BuildConfigEntryData.FromNameValue(name, EscapeWithQuotesIfNeeded(name, value));
         }
 
         public void AddProperty(string name, string value)
@@ -622,9 +650,9 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
 
         // name should be either release or debug
-        public static XCBuildConfiguration Create(string name)
+        public static XCBuildConfigurationData Create(string name)
         {
-            var res = new XCBuildConfiguration();
+            var res = new XCBuildConfigurationData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "XCBuildConfiguration");
             res.SetPropertyString("name", name);
@@ -650,7 +678,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
         public override void UpdateVars()
         {
-            entries = new SortedDictionary<string, BuildConfigEntry>();
+            entries = new SortedDictionary<string, BuildConfigEntryData>();
             if (m_Properties.Contains("buildSettings"))
             {
                 var dict = m_Properties["buildSettings"].AsDict();
@@ -662,7 +690,7 @@ namespace UnityEditor.iOS.Xcode.PBX
                         if (entries.ContainsKey(key))
                             entries[key].val.Add(value.AsString());
                         else
-                            entries.Add(key, BuildConfigEntry.FromNameValue(key, value.AsString()));
+                            entries.Add(key, BuildConfigEntryData.FromNameValue(key, value.AsString()));
                     }
                     else if (value is PBXElementArray)
                     {
@@ -673,7 +701,7 @@ namespace UnityEditor.iOS.Xcode.PBX
                                 if (entries.ContainsKey(key))
                                     entries[key].val.Add(pvalue.AsString());
                                 else
-                                    entries.Add(key, BuildConfigEntry.FromNameValue(key, pvalue.AsString()));
+                                    entries.Add(key, BuildConfigEntryData.FromNameValue(key, pvalue.AsString()));
                             }
                         }
                     }
@@ -682,7 +710,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
     
-    internal class PBXContainerItemProxy : PBXObject
+    internal class PBXContainerItemProxyData : PBXObjectData
     {
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "containerPortal/*"
@@ -690,10 +718,10 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         internal override PropertyCommentChecker checker { get { return checkerData; } }
         
-        public static PBXContainerItemProxy Create(string containerRef, string proxyType,
+        public static PBXContainerItemProxyData Create(string containerRef, string proxyType,
                                                    string remoteGlobalGUID, string remoteInfo)
         {
-            var res = new PBXContainerItemProxy();
+            var res = new PBXContainerItemProxyData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXContainerItemProxy");
             res.SetPropertyString("containerPortal", containerRef); // guid
@@ -704,7 +732,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXReferenceProxy : PBXObject
+    internal class PBXReferenceProxyData : PBXObjectData
     {
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "remoteRef/*"
@@ -714,10 +742,10 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         public string path { get { return GetPropertyString("path"); } }
 
-        public static PBXReferenceProxy Create(string path, string fileType,
-                                               string remoteRef, string sourceTree)
+        public static PBXReferenceProxyData Create(string path, string fileType,
+                                                   string remoteRef, string sourceTree)
         {
-            var res = new PBXReferenceProxy();
+            var res = new PBXReferenceProxyData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXReferenceProxy");
             res.SetPropertyString("path", path);
@@ -728,7 +756,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
     
-    internal class PBXTargetDependency : PBXObject
+    internal class PBXTargetDependencyData : PBXObjectData
     {
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "target/*",
@@ -737,9 +765,9 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         internal override PropertyCommentChecker checker { get { return checkerData; } }
         
-        public static PBXTargetDependency Create(string target, string targetProxy)
+        public static PBXTargetDependencyData Create(string target, string targetProxy)
         {
-            var res = new PBXTargetDependency();
+            var res = new PBXTargetDependencyData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXTargetDependency");
             res.SetPropertyString("target", target);
@@ -762,7 +790,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXProjectObject : PBXObject
+    internal class PBXProjectObjectData : PBXObjectData
     {
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "buildConfigurationList/*",
@@ -776,7 +804,8 @@ namespace UnityEditor.iOS.Xcode.PBX
 
         public List<ProjectReference> projectReferences = new List<ProjectReference>();
         public string mainGroup { get { return GetPropertyString("mainGroup"); } }
-        public List<string> targets { get { return GetPropertyList("targets"); } }
+        public List<string> targets = new List<string>();
+        public List<string> knownAssetTags = new List<string>();
         public string buildConfigList;
 
         public void AddReference(string productGroup, string projectRef)
@@ -797,8 +826,21 @@ namespace UnityEditor.iOS.Xcode.PBX
                     dict.SetString("ProjectRef", value.projectRef);
                 }
             };
+            SetPropertyList("targets", targets);
             SetPropertyString("buildConfigurationList", buildConfigList);
+            if (knownAssetTags.Count > 0)
+            {
+                PBXElementDict attrs;
+                if (m_Properties.Contains("attributes"))
+                    attrs = m_Properties["attributes"].AsDict();
+                else
+                    attrs = m_Properties.CreateDict("attributes");
+                var tags = attrs.CreateArray("knownAssetTags");
+                foreach (var tag in knownAssetTags)
+                    tags.AddString(tag);
+            }
         }
+
         public override void UpdateVars()
         {
             projectReferences = new List<ProjectReference>();
@@ -816,7 +858,21 @@ namespace UnityEditor.iOS.Xcode.PBX
                     }
                 }
             }
+            targets = GetPropertyList("targets");
             buildConfigList = GetPropertyString("buildConfigurationList");
+
+            // update knownAssetTags
+            knownAssetTags = new List<string>();
+            if (m_Properties.Contains("attributes"))
+            {
+                var el = m_Properties["attributes"].AsDict();
+                if (el.Contains("knownAssetTags"))
+                {
+                    var tags = el["knownAssetTags"].AsArray();
+                    foreach (var tag in tags.values)
+                        knownAssetTags.Add(tag.AsString());
+                }
+            }
         }
     }
 

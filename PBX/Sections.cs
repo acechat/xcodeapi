@@ -18,7 +18,7 @@ namespace UnityEditor.iOS.Xcode.PBX
     }
 
     // known section: contains objects that we care about
-    internal class KnownSectionBase<T> : SectionBase where T : PBXObject, new()
+    internal class KnownSectionBase<T> : SectionBase where T : PBXObjectData, new()
     {
         private Dictionary<string, T> m_Entries = new Dictionary<string, T>();
 
@@ -103,13 +103,13 @@ namespace UnityEditor.iOS.Xcode.PBX
     }
 
     // we assume there is only one PBXProject entry
-    internal class PBXProjectSection : KnownSectionBase<PBXProjectObject>
+    internal class PBXProjectSection : KnownSectionBase<PBXProjectObjectData>
     {
         public PBXProjectSection() : base("PBXProject")
         {
         }
 
-        public PBXProjectObject project
+        public PBXProjectObjectData project
         {
             get {
                 foreach (var kv in GetEntries())

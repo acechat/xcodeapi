@@ -194,8 +194,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             { ".strings",   new FileTypeDesc("text.plist.strings",      PBXFileType.Resource) },
             { ".storyboard",new FileTypeDesc("file.storyboard",         PBXFileType.Resource) },
             { ".bundle",    new FileTypeDesc("wrapper.plug-in",         PBXFileType.Resource) },
-            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) },
-            { ".dat",       new FileTypeDesc("file",                    PBXFileType.NotBuildable) }
+            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) }
         };
 
         public static bool IsKnownExtension(string ext)
@@ -210,8 +209,10 @@ namespace UnityEditor.iOS.Xcode.PBX
             return false;
         }
 
-        public static PBXFileType GetFileType(string ext)
+        public static PBXFileType GetFileType(string ext, bool isFolderRef)
         {
+            if (isFolderRef)
+                return PBXFileType.Resource;
             if (!types.ContainsKey(ext))
                 return PBXFileType.Resource;
             return types[ext].type;
@@ -228,13 +229,20 @@ namespace UnityEditor.iOS.Xcode.PBX
             return "file";
         }
 
-        public static bool IsBuildable(string ext)
+        public static bool IsBuildableFile(string ext)
         {
             if (!types.ContainsKey(ext))
                 return true;
             if (types[ext].type != PBXFileType.NotBuildable)
                 return true;
             return false;
+        }
+
+        public static bool IsBuildable(string ext, bool isFolderReference)
+        {
+            if (isFolderReference)
+                return true;
+            return IsBuildableFile(ext);
         }
 
         private static readonly Dictionary<PBXSourceTree, string> sourceTree = new Dictionary<PBXSourceTree, string> 
@@ -332,6 +340,13 @@ namespace UnityEditor.iOS.Xcode.PBX
                 return path;
             else
                 return path.Substring(pos + 1);
+        }
+
+        public static string[] SplitPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return new string[]{};
+            return path.Split(new[]{'/'}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
