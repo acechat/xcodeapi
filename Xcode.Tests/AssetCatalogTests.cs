@@ -232,6 +232,38 @@ namespace Unity.PureCSharpTests.iOSExtensions
                 Directory.Delete(catalogPath, true);
             }
         }
+        
+        [Test]
+        public void BrandAssetCreationWorks()
+        {
+            var testFiles = new TestFileCache(Path.Combine(GetTestOutputPath(), "BrandAsset11Files"));
+            
+            string catalogPath = Path.Combine(GetTestOutputPath(), "BrandAsset1.xcassets");
+            var catalog = new AssetCatalog(catalogPath, "test.test");
+            var brandAssets = catalog.OpenBrandAssetGroup("brand1");
+
+            var icon1 = brandAssets.OpenImageSet("icon1", "tv", "primary-app-icon", 128, 256);
+            icon1.AddVariant(new DeviceRequirement(), testFiles.CreateFile("data1.png", "img1"));
+            catalog.Write();
+            
+            string brandAssetsPath = Path.Combine(catalogPath, "brand1.brandassets");
+            string icon1Path = Path.Combine(brandAssetsPath, "icon1.imageset");
+            Assert.IsTrue(Directory.Exists(catalogPath));
+            Assert.IsTrue(Directory.Exists(brandAssetsPath));
+            Assert.IsTrue(Directory.Exists(icon1Path));
+            
+            AssertFileExistsAndHasContents(Path.Combine(brandAssetsPath, "Contents.json"),
+                                           File.ReadAllText(Path.Combine(GetTestSourcePath(), "BrandAssets1.Contents.json")));
+            AssertFileExistsAndHasContents(Path.Combine(icon1Path, "Contents.json"),
+                                           File.ReadAllText(Path.Combine(GetTestSourcePath(), "BrandAssets1.icon1.Contents.json")));
+            AssertFileExistsAndHasContents(Path.Combine(icon1Path, "data1.png"), "img1");
+            
+            if (!DebugEnabled())
+            {
+                testFiles.CleanUp();
+                Directory.Delete(catalogPath, true);
+            }
+        }
     }
 
 } // namespace Unity.PureCSharpTests.iOSExtensions

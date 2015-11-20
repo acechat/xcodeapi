@@ -157,6 +157,12 @@ namespace UnityEditor.iOS.Xcode
             return folder.OpenImageStack(Path.GetFileName(relativePath));
         }
 
+        public AssetBrandAssetGroup OpenBrandAssetGroup(string relativePath)
+        {
+            var folder = OpenFolderForResource(relativePath);
+            return folder.OpenBrandAssetGroup(Path.GetFileName(relativePath));
+        }
+
         // Checks if a folder with given path exists and returns it if it does.
         // Otherwise, creates a new folder. Parent folders are created if needed.
         public AssetFolder OpenFolder(string relativePath)
@@ -319,6 +325,19 @@ namespace UnityEditor.iOS.Xcode
             var imageStack = new AssetImageStack(m_Path, name, authorId);
             m_Items.Add(imageStack);
             return imageStack;
+        }
+        
+        // Checks if a brand asset with given name exists and returns it if it does.
+        // Otherwise, creates a new brand asset.
+        public AssetBrandAssetGroup OpenBrandAssetGroup(string name)
+        {
+            var item = GetExistingItemWithType<AssetBrandAssetGroup>(name);
+            if (item != null)
+                return item;
+            
+            var brandAsset = new AssetBrandAssetGroup(m_Path, name, authorId);
+            m_Items.Add(brandAsset);
+            return brandAsset;
         }
 
         // Returns the requested item or null if not found
@@ -717,6 +736,75 @@ namespace UnityEditor.iOS.Xcode
  
                 var docLayer = docLayers.AddDict();
                 docLayer.SetString("filename", Path.GetFileName(layer.path));
+            }
+            doc.WriteToFile(Path.Combine(m_Path, "Contents.json"));
+        }
+    }
+    
+    class AssetBrandAssetGroup : AssetCatalogItem
+    {
+        class AssetBrandAssetItem
+        {
+            internal string idiom = null;
+            internal string role = null;
+            internal int width, height;
+            internal AssetCatalogItem item = null;
+            
+        }
+
+        List<AssetBrandAssetItem> m_Items = new List<AssetBrandAssetItem>();
+        
+        internal AssetBrandAssetGroup(string assetCatalogPath, string name, string authorId) : base(name, authorId)
+        {
+            m_Path = Path.Combine(assetCatalogPath, name + ".brandassets");
+        }
+        
+        void AddItem(AssetCatalogItem item, string idiom, string role, int width, int height)
+        {
+            foreach (var it in m_Items)
+            {
+                if (it.item.name == item.name)
+                    throw new Exception("An item with given name already exists");
+            }
+            var newItem = new AssetBrandAssetItem();
+            newItem.item = item;
+            newItem.idiom = idiom;
+            newItem.role = role;
+            newItem.width = width;
+            newItem.height = height;
+            m_Items.Add(newItem);
+        }
+
+        public AssetImageSet OpenImageSet(string name, string idiom, string role, int width, int height)
+        {
+            var newItem = new AssetImageSet(m_Path, name, authorId);
+            AddItem(newItem, idiom, role, width, height);
+            return newItem;
+        }
+
+        public AssetImageStack OpenImageStack(string name, string idiom, string role, int width, int height)
+        {
+            var newItem = new AssetImageStack(m_Path, name, authorId);
+            AddItem(newItem, idiom, role, width, height);
+            return newItem;
+        }
+        
+        public override void Write(List<string> warnings)
+        {
+            Directory.CreateDirectory(m_Path);
+            var doc = new JsonDocument();
+            WriteInfoToJson(doc);
+            
+            var docAssets = doc.root.CreateArray("assets");
+            foreach (var item in m_Items)
+            {
+                var docAsset = docAssets.AddDict();
+                docAsset.SetString("size", String.Format("{0}x{1}", item.width, item.height));
+                docAsset.SetString("idiom", item.idiom);
+                docAsset.SetString("role", item.role);
+                docAsset.SetString("filename", Path.GetFileName(item.item.path));
+                
+                item.item.Write(warnings);
             }
             doc.WriteToFile(Path.Combine(m_Path, "Contents.json"));
         }
