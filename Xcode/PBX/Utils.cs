@@ -194,7 +194,8 @@ namespace UnityEditor.iOS.Xcode.PBX
             { ".strings",   new FileTypeDesc("text.plist.strings",      PBXFileType.Resource) },
             { ".storyboard",new FileTypeDesc("file.storyboard",         PBXFileType.Resource) },
             { ".bundle",    new FileTypeDesc("wrapper.plug-in",         PBXFileType.Resource) },
-            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) }
+            { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) },
+            { ".tbd",       new FileTypeDesc("sourcecode.text-based-dylib-definition",  PBXFileType.Framework) }
         };
 
         public static bool IsKnownExtension(string ext)
