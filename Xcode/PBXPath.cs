@@ -48,11 +48,24 @@ namespace UnityEditor.iOS.Xcode
         
         public static string GetDirectory(string path)
         {
+            path = path.TrimEnd('/');
             int pos = path.LastIndexOf('/');
             if (pos == -1)
                 return "";
             else
                 return path.Substring(0, pos);
+        }
+
+        public static string GetCurrentDirectory()
+        {
+            if (Environment.OSVersion.Platform != PlatformID.MacOSX)
+                throw new Exception("PBX project compatible current directory can only obtained on OSX");
+                
+            string path = Directory.GetCurrentDirectory();
+            path = FixSlashes(path);
+            if (!IsPathRooted(path))
+                return "/" + path;
+            return path;
         }
         
         public static string GetFilename(string path)
@@ -62,6 +75,21 @@ namespace UnityEditor.iOS.Xcode
                 return path;
             else
                 return path.Substring(pos + 1);
+        }
+
+        public static bool IsPathRooted(string path)
+        {
+            if (path == null || path.Length == 0)
+                return false;
+            return path[0] == '/';
+        }
+        
+        public static string GetFullPath(string path)
+        {
+            if (IsPathRooted(path))
+                return path;
+            else
+                return Combine(GetCurrentDirectory(), path);
         }
 
         public static string[] Split(string path)
