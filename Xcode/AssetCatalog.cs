@@ -121,7 +121,7 @@ namespace UnityEditor.iOS.Xcode
 
         AssetFolder OpenFolderForResource(string relativePath)
         {
-            var pathItems = PBX.Utils.SplitPath(relativePath).ToList();
+            var pathItems = PBXPath.Split(relativePath).ToList();
 
             // remove path filename
             pathItems.RemoveAt(pathItems.Count - 1);
@@ -169,7 +169,7 @@ namespace UnityEditor.iOS.Xcode
         {
             if (relativePath == null)
                 return root;
-            var pathItems = PBX.Utils.SplitPath(relativePath);
+            var pathItems = PBXPath.Split(relativePath);
             if (pathItems.Length == 0)
                 return root;
             AssetFolder folder = root;
@@ -186,7 +186,7 @@ namespace UnityEditor.iOS.Xcode
         public AssetFolder OpenNamespacedFolder(string relativeBasePath, string namespacePath)
         {
             var folder = OpenFolder(relativeBasePath);
-            var pathItems = PBX.Utils.SplitPath(namespacePath);
+            var pathItems = PBXPath.Split(namespacePath);
             foreach (var pathItem in pathItems)
             {
                 folder = folder.OpenFolder(pathItem);

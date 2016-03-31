@@ -235,8 +235,8 @@ namespace UnityEditor.iOS.Xcode
 
                 if (fileRef != null)
                 {
-                    pPath = Utils.CombinePaths(projectPath, fileRef.name);
-                    Utils.CombinePaths(realPath, realPathTree, fileRef.path, fileRef.tree, out rPath, out rTree);
+                    pPath = PBXPath.Combine(projectPath, fileRef.name);
+                    PBXPath.Combine(realPath, realPathTree, fileRef.path, fileRef.tree, out rPath, out rTree);
 
                     if (!m_ProjectPathToFileRefMap.ContainsKey(pPath))
                     {
@@ -261,8 +261,8 @@ namespace UnityEditor.iOS.Xcode
                 PBXGroupData gr = groups[guid];
                 if (gr != null)
                 {
-                    pPath = Utils.CombinePaths(projectPath, gr.name);
-                    Utils.CombinePaths(realPath, realPathTree, gr.path, gr.tree, out rPath, out rTree);
+                    pPath = PBXPath.Combine(projectPath, gr.name);
+                    PBXPath.Combine(realPath, realPathTree, gr.path, gr.tree, out rPath, out rTree);
 
                     if (!m_ProjectPathToGroupMap.ContainsKey(pPath))
                     {
