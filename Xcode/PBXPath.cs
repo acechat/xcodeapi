@@ -58,8 +58,11 @@ namespace UnityEditor.iOS.Xcode
 
         public static string GetCurrentDirectory()
         {
-            if (Environment.OSVersion.Platform != PlatformID.MacOSX)
+            if (Environment.OSVersion.Platform != PlatformID.MacOSX &&
+                Environment.OSVersion.Platform != PlatformID.Unix)
+            {
                 throw new Exception("PBX project compatible current directory can only obtained on OSX");
+            }
                 
             string path = Directory.GetCurrentDirectory();
             path = FixSlashes(path);
