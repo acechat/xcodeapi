@@ -565,23 +565,35 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXShellScriptBuildPhaseData : PBXObjectData
+    internal class PBXShellScriptBuildPhaseData : FileGUIDListBase
     {
-        public GUIDList files;
+        public string shellPath;
+        public string shellScript;
 
-        private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
-            "files/*",
-        });
-        
-        internal override PropertyCommentChecker checker { get { return checkerData; } }
-        
+        public static PBXShellScriptBuildPhaseData Create(string shellPath, string shellScript)
+        {
+            var res = new PBXShellScriptBuildPhaseData();
+            res.guid = PBXGUID.Generate();
+            res.SetPropertyString("isa", "PBXShellScriptBuildPhase");
+            res.SetPropertyString("buildActionMask", "2147483647");
+            res.files = new List<string>();
+            res.SetPropertyString("runOnlyForDeploymentPostprocessing", "0");
+            res.shellPath = shellPath;
+            res.shellScript = shellScript;
+            return res;
+        }
+
         public override void UpdateProps()
         {
-            SetPropertyList("files", files);
+            base.UpdateProps();
+            SetPropertyString("shellPath", shellPath);
+            SetPropertyString("shellScript", shellScript);
         }
         public override void UpdateVars()
         {
-            files = GetPropertyList("files");
+            base.UpdateVars();
+            shellPath = GetPropertyString("shellPath");
+            shellScript = GetPropertyString("shellScript");
         }
     }
 
