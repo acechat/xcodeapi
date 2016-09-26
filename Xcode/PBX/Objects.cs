@@ -22,6 +22,16 @@ namespace UnityEditor.iOS.Xcode.PBX
         { 
             return m_Properties; 
         }
+
+        /*  Returns the internal properties dictionary which the user may manipulate directly.
+            If any of the properties are modified, UpdateVars() must be called before any other
+            operation affecting the given Xcode document is executed.
+        */
+        internal PBXElementDict GetPropertiesRaw()
+        {
+            UpdateProps();
+            return m_Properties;
+        }
         
         // returns null if it does not exist
         protected string GetPropertyString(string name)
