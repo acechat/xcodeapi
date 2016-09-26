@@ -862,6 +862,11 @@ namespace UnityEditor.iOS.Xcode
         {
             return m_Data.WriteToString();
         }
+
+        internal PBXProjectObjectData GetProjectInternal()
+        {
+            return project.project;
+        }
     }
 
 } // namespace UnityEditor.iOS.Xcode
