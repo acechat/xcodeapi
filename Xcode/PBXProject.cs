@@ -883,6 +883,55 @@ namespace UnityEditor.iOS.Xcode
         {
             return project.project;
         }
+
+        /*
+         * Allows the setting of target attributes in the project section such as Provisioning Style and Team ID for each target
+         *
+         * The Target Attributes are structured like so:
+         * attributes = {
+         *      TargetAttributes = {
+         *          1D6058900D05DD3D006BFB54 = {
+         *              DevelopmentTeam = Z6SFPV59E3;
+         *              ProvisioningStyle = Manual;
+         *          };
+         *          5623C57217FDCB0800090B9E = {
+         *              DevelopmentTeam = Z6SFPV59E3;
+         *              ProvisioningStyle = Manual;
+         *              TestTargetID = 1D6058900D05DD3D006BFB54;
+         *          };
+         *      };
+         *  };
+         */
+        internal void SetTargetAttributes(string key, string value)
+        {
+            PBXElementDict properties = project.project.GetPropertiesRaw();
+            PBXElementDict attributes;
+            PBXElementDict targetAttributes;
+            if (properties.Contains("attributes")) {
+                attributes = properties["attributes"] as PBXElementDict;
+            } else {
+                attributes = properties.CreateDict("attributes");
+            }
+
+            if (attributes.Contains("TargetAttributes")) {
+                targetAttributes = attributes["TargetAttributes"] as PBXElementDict;
+            } else {
+                targetAttributes = attributes.CreateDict("TargetAttributes");
+            }
+
+            foreach (KeyValuePair<string, PBXNativeTargetData> target in nativeTargets.GetEntries()) {
+                PBXElementDict targetAttributesRaw;
+                if (targetAttributes.Contains(target.Key))
+                {
+                    targetAttributesRaw = targetAttributes[target.Key].AsDict();
+                } else {
+                    targetAttributesRaw = targetAttributes.CreateDict(target.Key);
+                }
+                targetAttributesRaw.SetString(key, value); 
+            }
+            project.project.UpdateVars();
+
+        }
     }
 
 } // namespace UnityEditor.iOS.Xcode
