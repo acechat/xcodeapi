@@ -567,10 +567,11 @@ namespace UnityEditor.iOS.Xcode.PBX
 
     internal class PBXShellScriptBuildPhaseData : FileGUIDListBase
     {
+        public string name;
         public string shellPath;
         public string shellScript;
 
-        public static PBXShellScriptBuildPhaseData Create(string shellPath, string shellScript)
+        public static PBXShellScriptBuildPhaseData Create(string name, string shellPath, string shellScript)
         {
             var res = new PBXShellScriptBuildPhaseData();
             res.guid = PBXGUID.Generate();
@@ -578,6 +579,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             res.SetPropertyString("buildActionMask", "2147483647");
             res.files = new List<string>();
             res.SetPropertyString("runOnlyForDeploymentPostprocessing", "0");
+            res.name = name;
             res.shellPath = shellPath;
             res.shellScript = shellScript;
             return res;
@@ -586,12 +588,14 @@ namespace UnityEditor.iOS.Xcode.PBX
         public override void UpdateProps()
         {
             base.UpdateProps();
+            SetPropertyString("name", name);
             SetPropertyString("shellPath", shellPath);
             SetPropertyString("shellScript", shellScript);
         }
         public override void UpdateVars()
         {
             base.UpdateVars();
+            name = GetPropertyString("name");
             shellPath = GetPropertyString("shellPath");
             shellScript = GetPropertyString("shellScript");
         }
