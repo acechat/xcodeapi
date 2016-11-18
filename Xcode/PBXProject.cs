@@ -832,6 +832,14 @@ namespace UnityEditor.iOS.Xcode
                 UpdateBuildProperty(guid, name, addValues, removeValues);
         }
 
+        internal void AppendShellScriptBuildPhase(string targetGuid, string name, string shellPath, string shellScript)
+        {
+            PBXShellScriptBuildPhaseData shellScriptPhase = PBXShellScriptBuildPhaseData.Create(name, shellPath, shellScript);
+
+            shellScripts.AddEntry(shellScriptPhase);
+            nativeTargets[targetGuid].phases.AddGUID(shellScriptPhase.guid);
+        }
+
         internal void AppendShellScriptBuildPhase(IEnumerable<string> targetGuids, string name, string shellPath, string shellScript)
         {
             PBXShellScriptBuildPhaseData shellScriptPhase = PBXShellScriptBuildPhaseData.Create(name, shellPath, shellScript);
