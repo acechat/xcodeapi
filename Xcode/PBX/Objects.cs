@@ -635,6 +635,7 @@ namespace UnityEditor.iOS.Xcode.PBX
     {
         protected SortedDictionary<string, BuildConfigEntryData> entries = new SortedDictionary<string, BuildConfigEntryData>();
         public string name { get { return GetPropertyString("name"); } }
+        public string baseConfigurationReference; // may be null
 
         // Note that QuoteStringIfNeeded does its own escaping. Double-escaping with quotes is
         // required to please Xcode that does not handle paths with spaces if they are not 
@@ -687,6 +688,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         public override void UpdateProps()
         {
+            SetPropertyString("baseConfigurationReference", baseConfigurationReference);
+
             var dict = m_Properties.CreateDict("buildSettings");
             foreach (var kv in entries)
             {
@@ -704,6 +707,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
         public override void UpdateVars()
         {
+            baseConfigurationReference = GetPropertyString("baseConfigurationReference");
+
             entries = new SortedDictionary<string, BuildConfigEntryData>();
             if (m_Properties.Contains("buildSettings"))
             {

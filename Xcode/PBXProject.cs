@@ -732,6 +732,13 @@ namespace UnityEditor.iOS.Xcode
                 return nativeTargets[targetGuid].buildConfigList;
         }
 
+        // Sets the baseConfigurationReference key for a XCBuildConfiguration. 
+        // If the argument is null, the base configuration is removed.
+        internal void SetBaseReferenceForConfig(string configGuid, string baseReference)
+        {
+            buildConfigs[configGuid].baseConfigurationReference = baseReference;
+        }
+
         // Adds an item to a build property that contains a value list. Duplicate build properties
         // are ignored. Values for name "LIBRARY_SEARCH_PATHS" are quoted if they contain spaces.
         // targetGuid may refer to PBXProject object
