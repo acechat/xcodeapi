@@ -839,6 +839,17 @@ namespace UnityEditor.iOS.Xcode
                 UpdateBuildProperty(guid, name, addValues, removeValues);
         }
 
+        internal string ShellScriptByName(string targetGuid, string name)
+        {
+            foreach (var phase in nativeTargets[targetGuid].phases)
+            {
+                var script = shellScripts[phase];
+                if (script != null && script.name == name)
+                    return script.guid;
+            }
+            return null;
+        }
+
         internal void AppendShellScriptBuildPhase(string targetGuid, string name, string shellPath, string shellScript)
         {
             PBXShellScriptBuildPhaseData shellScriptPhase = PBXShellScriptBuildPhaseData.Create(name, shellPath, shellScript);
