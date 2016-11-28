@@ -676,19 +676,11 @@ namespace UnityEditor.iOS.Xcode
             config.AddProperty("SKIP_INSTALL", "YES");
         }
 
-        internal PBXNativeTargetData CreateNewTarget(string name, string ext, string type)
+        // Returns the GUID of the new target
+        public string AddTarget(string name, string ext, string type)
         {
-            // create build configurations
-            var releaseBuildConfig = XCBuildConfigurationData.Create("Release");
-            buildConfigs.AddEntry(releaseBuildConfig);
-            
-            var debugBuildConfig = XCBuildConfigurationData.Create("Debug");
-            buildConfigs.AddEntry(debugBuildConfig);
-            
             var buildConfigList = XCConfigurationListData.Create();
             configs.AddEntry(buildConfigList);
-            buildConfigList.buildConfigs.AddGUID(releaseBuildConfig.guid);
-            buildConfigList.buildConfigs.AddGUID(debugBuildConfig.guid);
             
             // create build file reference
             string fullName = name + ext;
@@ -697,14 +689,29 @@ namespace UnityEditor.iOS.Xcode
             nativeTargets.AddEntry(newTarget);
             project.project.targets.Add(newTarget.guid);
             
-            return newTarget;
+            return newTarget.guid;
+        }
+
+        // Returns the GUID of the new configuration
+        public string AddBuildConfigForTarget(string targetGuid, string name)
+        {
+            if (BuildConfigByName(targetGuid, name) != null)
+            {
+                throw new Exception(String.Format("A build configuration by name {0} already exists for target {1}",
+                                                  targetGuid, name));
+            }
+            var buildConfig = XCBuildConfigurationData.Create(name);
+            buildConfigs.AddEntry(buildConfig);
+
+            configs[GetConfigListForTarget(targetGuid)].buildConfigs.AddGUID(buildConfig.guid);
+            return buildConfig.guid;
         }
 
         // Returns the guid of the new target
         internal string AddAppExtension(string mainTarget, string name, string infoPlistPath)
         {
             string ext = ".appex";
-            var newTarget = CreateNewTarget(name, ext, "com.apple.product-type.app-extension");
+            var newTarget = nativeTargets[AddTarget(name, ext, "com.apple.product-type.app-extension")];
             
             SetDefaultAppExtensionReleaseBuildFlags(buildConfigs[BuildConfigByName(newTarget.guid, "Release")], infoPlistPath);
             SetDefaultAppExtensionDebugBuildFlags(buildConfigs[BuildConfigByName(newTarget.guid, "Debug")], infoPlistPath);

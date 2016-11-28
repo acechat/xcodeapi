@@ -339,7 +339,18 @@ namespace Unity.PureCSharpTests.iOSExtensions
             proj.RemoveFilesByProjectPathRecursive("Classes/path");
             TestOutput(proj, "rm_recursive1.pbxproj");
         }
-        
+
+        [Test]
+        public void AddTargetWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.AddTarget("TestTarget", ".dylib", "test.type");
+            proj.AddBuildConfigForTarget(target, "CustomConfig1");
+            proj.AddBuildConfigForTarget(target, "CustomConfig2");
+            TestOutput(proj, "add_target1.pbxproj");
+        }
+
         [Test]
         public void StrippedProjectReadingWorks()
         {
