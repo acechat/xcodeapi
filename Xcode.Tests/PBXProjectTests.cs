@@ -354,6 +354,19 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void AddBuildPhasesWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.AddTarget("TestTarget", ".dylib", "test.type");
+            proj.AddSourcesBuildPhase(target);
+            proj.AddResourcesBuildPhase(target);
+            proj.AddFrameworksBuildPhase(target);
+            proj.AddCopyFilesBuildPhase(target, "Copy resources", "$(DST_PATH)", "13");
+            TestOutput(proj, "add_build_phases1.pbxproj");
+        }
+
+        [Test]
         public void StrippedProjectReadingWorks()
         {
             PBXProject proj = ReadPBXProject("base_stripped.pbxproj");
