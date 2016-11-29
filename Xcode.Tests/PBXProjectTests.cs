@@ -111,11 +111,9 @@ namespace Unity.PureCSharpTests.iOSExtensions
         public void BuildOptionsWork2()
         {
             ResetGuidGenerator();
-            
-            string target, ptarget;
-
+    
             PBXProject proj = ReadPBXProject();
-            target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
 
             // check that we can append multiple options
             proj.AddBuildProperty(target, "TEST_ADD", "test2");
@@ -364,6 +362,27 @@ namespace Unity.PureCSharpTests.iOSExtensions
             proj.AddFrameworksBuildPhase(target);
             proj.AddCopyFilesBuildPhase(target, "Copy resources", "$(DST_PATH)", "13");
             TestOutput(proj, "add_build_phases1.pbxproj");
+        }
+
+        [Test]
+        public void AddWatchExtensionWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            PBXProjectHelpers.AddWatchExtension(proj, target, "Watchtest Extension", "Watchtest Extension/Info.plist");
+            TestOutput(proj, "add_watch_extension.pbxproj");
+        }
+
+        [Test]
+        public void AddWatchAppAndExtensionWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string extTargetGuid = PBXProjectHelpers.AddWatchExtension(proj, target, "watchtest Extension", "watchtest Extension/Info.plist");
+            PBXProjectHelpers.AddWatchApp(proj, target, extTargetGuid, "watchtest", "com.company.product", "watchtest/Info.plist");
+            TestOutput(proj, "add_watch_app_and_extension.pbxproj");
         }
 
         [Test]
