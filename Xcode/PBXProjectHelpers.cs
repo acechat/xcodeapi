@@ -113,12 +113,16 @@ namespace UnityEditor.iOS.Xcode
             { "LD_RUNPATH_SEARCH_PATHS", "$(inherited)" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks" },
-            { "PRODUCT_BUNDLE_IDENTIFIER", "com.unity3d.ios.watchkitapp.watchkitextension" },
+            // { "PRODUCT_BUNDLE_IDENTIFIER", "<bundle id>" },
             { "PRODUCT_NAME", "${TARGET_NAME}" },
             { "SDKROOT", "watchos" },
             { "SKIP_INSTALL", "YES" },
             { "TARGETED_DEVICE_FAMILY", "4" },
             { "WATCHOS_DEPLOYMENT_TARGET", "3.1" },
+            // the following are needed to override project settings in Unity Xcode project
+            { "ARCHS", "$(ARCHS_STANDARD)" },
+            { "SUPPORTED_PLATFORMS", "watchos" },
+            { "SUPPORTED_PLATFORMS", "watchsimulator" },
         };
 
         internal static FlagList watchExtensionDebugBuildFlags = new FlagList
@@ -135,12 +139,16 @@ namespace UnityEditor.iOS.Xcode
             { "LD_RUNPATH_SEARCH_PATHS", "$(inherited)" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks" },
-            { "PRODUCT_BUNDLE_IDENTIFIER", "com.unity3d.ios.watchkitapp.watchkitextension" },
+            // { "PRODUCT_BUNDLE_IDENTIFIER", "<bundle id>" },
             { "PRODUCT_NAME", "${TARGET_NAME}" },
             { "SDKROOT", "watchos" },
             { "SKIP_INSTALL", "YES" },
             { "TARGETED_DEVICE_FAMILY", "4" },
             { "WATCHOS_DEPLOYMENT_TARGET", "3.1" },
+            // the following are needed to override project settings in Unity Xcode project
+            { "ARCHS", "$(ARCHS_STANDARD)" },
+            { "SUPPORTED_PLATFORMS", "watchos" },
+            { "SUPPORTED_PLATFORMS", "watchsimulator" },
         };
 
         internal static FlagList watchAppReleaseBuildFlags = new FlagList
@@ -160,6 +168,10 @@ namespace UnityEditor.iOS.Xcode
             { "SKIP_INSTALL", "YES" },
             { "TARGETED_DEVICE_FAMILY", "4" },
             { "WATCHOS_DEPLOYMENT_TARGET", "3.1" },
+            // the following are needed to override project settings in Unity Xcode project
+            { "ARCHS", "$(ARCHS_STANDARD)" },
+            { "SUPPORTED_PLATFORMS", "watchos" },
+            { "SUPPORTED_PLATFORMS", "watchsimulator" },
         };
 
         internal static FlagList watchAppDebugBuildFlags = new FlagList
@@ -180,6 +192,10 @@ namespace UnityEditor.iOS.Xcode
             { "SKIP_INSTALL", "YES" },
             { "TARGETED_DEVICE_FAMILY", "4" },
             { "WATCHOS_DEPLOYMENT_TARGET", "3.1" },
+            // the following are needed to override project settings in Unity Xcode project
+            { "ARCHS", "$(ARCHS_STANDARD)" },
+            { "SUPPORTED_PLATFORMS", "watchos" },
+            { "SUPPORTED_PLATFORMS", "watchsimulator" },
         };
 
         static void SetBuildFlagsFromDict(PBXProject proj, string configGuid, IEnumerable<KeyValuePair<string, string>> data)
@@ -219,7 +235,8 @@ namespace UnityEditor.iOS.Xcode
         }
 
         // Returns the guid of the new target
-        public static string AddAppExtension(PBXProject proj, string mainTarget, string name, string infoPlistPath)
+        public static string AddAppExtension(PBXProject proj, string mainTarget, 
+                                             string name, string infoPlistPath)
         {
             string ext = ".appex";
             var newTargetGuid = proj.AddTarget(name, ext, "com.apple.product-type.app-extension");
@@ -276,7 +293,8 @@ namespace UnityEditor.iOS.Xcode
             return newTargetGuid;
         }
 
-        public static string AddWatchExtension(PBXProject proj, string mainTarget, string name, string infoPlistPath)
+        public static string AddWatchExtension(PBXProject proj, string mainTarget, 
+                                               string name, string bundleId, string infoPlistPath)
         {
             var newTargetGuid = proj.AddTarget(name, ".appex", "com.apple.product-type.watchkit2-extension");
 
@@ -287,6 +305,7 @@ namespace UnityEditor.iOS.Xcode
             SetDefaultWatchExtensionReleaseBuildFlags(proj, releaseConfigGuid);
 
             var configs = new string[] { debugConfigGuid, releaseConfigGuid };
+            proj.SetBuildPropertyForConfig(configs, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
             proj.SetBuildPropertyForConfig(configs, "INFOPLIST_FILE", infoPlistPath);
 
             proj.AddSourcesBuildPhase(newTargetGuid);
