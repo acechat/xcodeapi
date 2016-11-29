@@ -39,6 +39,7 @@
     <Compile Include="PBX\Utils.cs" />
     <Compile Include="PBX\Elements.cs" />
     <Compile Include="PBXProjectData.cs" />
+    <Compile Include="PBXProjectHelpers.cs" />
     <Compile Include="JsonParser.cs" />
     <Compile Include="AssetCatalog.cs" />
     <Compile Include="PBXPath.cs" />
