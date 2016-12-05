@@ -807,6 +807,10 @@ namespace UnityEditor.iOS.Xcode.PBX
         public List<string> targets = new List<string>();
         public List<string> knownAssetTags = new List<string>();
         public string buildConfigList;
+        // the name of the entitlements file required for some capabilities.
+        public string entitlementsFile;
+        public List<PBXCapabilitiesType> capabilities = new List<PBXCapabilitiesType>();
+
 
         public void AddReference(string productGroup, string projectRef)
         {
@@ -873,6 +877,34 @@ namespace UnityEditor.iOS.Xcode.PBX
                         knownAssetTags.Add(tag.AsString());
                 }
             }
+        }
+
+        public void UpdateCapabilities(string targetEntry)
+        {
+            // get or create the tree for capabilities
+            var attrs = m_Properties.Contains("attributes") ? m_Properties["attributes"].AsDict() : m_Properties.CreateDict("attributes");
+            var targAttr = attrs.Contains("TargetAttributes") ? attrs["TargetAttributes"].AsDict() : attrs.CreateDict("TargetAttributes");
+            var target = targAttr.Contains(targetEntry) ? targAttr[targetEntry].AsDict() : targAttr.CreateDict(targetEntry);
+            var sysCap = target.Contains("SystemCapabilities") ? target["SystemCapabilities"].AsDict() : target.CreateDict("SystemCapabilities");
+
+            // enable the capabilities.
+            foreach (var capabilityDic in capabilities)
+            {
+                var capabilityId = capabilityDic.Id;
+                var currentCapability = sysCap.Contains(capabilityId) ? sysCap[capabilityId].AsDict() : sysCap.CreateDict(capabilityId);
+
+                currentCapability.SetString("enabled", "1");
+
+
+            }
+        }
+
+        public void UpdateTeamId(string teamId, string targetEntry)
+        {
+            var attrs = m_Properties.Contains("attributes") ? m_Properties["attributes"].AsDict() : m_Properties.CreateDict("attributes");
+            var targAttr = attrs.Contains("TargetAttributes") ? attrs["TargetAttributes"].AsDict() : attrs.CreateDict("TargetAttributes");
+            var target = targAttr.Contains(targetEntry) ? targAttr[targetEntry].AsDict() : targAttr.CreateDict(targetEntry);
+            target.SetString("DevelopmentTeam", teamId);
         }
     }
 
