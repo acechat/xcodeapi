@@ -692,6 +692,19 @@ namespace UnityEditor.iOS.Xcode
             return newTarget.guid;
         }
 
+        // Sets up a dependency between two targets. targetGuid is dependent on targetDependencyGuid
+        public void AddTargetDependency(string targetGuid, string targetDependencyGuid)
+        {
+            string dependencyName = nativeTargets[targetDependencyGuid].name;
+            var containerProxy = PBXContainerItemProxyData.Create(project.project.guid, "1", targetDependencyGuid, dependencyName);
+            containerItems.AddEntry(containerProxy);
+
+            var targetDependency = PBXTargetDependencyData.Create(targetDependencyGuid, containerProxy.guid);
+            targetDependencies.AddEntry(targetDependency);
+
+            nativeTargets[targetGuid].dependencies.AddGUID(targetDependency.guid);
+        }
+
         // Returns the GUID of the new configuration
         public string AddBuildConfigForTarget(string targetGuid, string name)
         {

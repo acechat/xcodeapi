@@ -345,9 +345,11 @@ namespace Unity.PureCSharpTests.iOSExtensions
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
-            string target = proj.AddTarget("TestTarget", ".dylib", "test.type");
-            proj.AddBuildConfigForTarget(target, "CustomConfig1");
-            proj.AddBuildConfigForTarget(target, "CustomConfig2");
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string newTarget = proj.AddTarget("TestTarget", ".dylib", "test.type");
+            proj.AddBuildConfigForTarget(newTarget, "CustomConfig1");
+            proj.AddBuildConfigForTarget(newTarget, "CustomConfig2");
+            proj.AddTargetDependency(target, newTarget);
             TestOutput(proj, "add_target1.pbxproj");
         }
 
