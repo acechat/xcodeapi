@@ -10,7 +10,7 @@
  * PBXProject project = capabilityManager.AddPushNotifications().AddGameCenter().AddHomeKit().AddHealthKit().PBXProject;
  * capabilityManager.AddMaps(MapsOptions.Airplane | MapsOptions.Bike | MapsOptions.RideSharing);
  * project.SetTeamId(YourTeamIdFromAppleDeveloperConsole);
- * capabilityManager.close();
+ * capabilityManager.Close();
  * \endcode
  *
  */
@@ -127,10 +127,10 @@ namespace UnityEditor.iOS.Xcode
         /// <summary>
         /// Add Push (or remote) Notifications capability to your project
         /// </summary>
-        /// <param name="developement">Indicate if this is a development build with a development provisoning profile</param>
-        public ProjectCapabilityManager AddPushNotifications(bool developement = true)
+        /// <param name="development">Indicate if this is a development build with a development provisoning profile</param>
+        public ProjectCapabilityManager AddPushNotifications(bool development = true)
         {
-            getOrCreateEntitlementDoc().root[PNEnt.Key] = new PlistElementString(developement ? PNEnt.DevValue : PNEnt.ProdValue);
+            getOrCreateEntitlementDoc().root[PNEnt.Key] = new PlistElementString(development ? PNEnt.DevValue : PNEnt.ProdValue);
             PBXProject.EnableCapability(PBXCapabilitiesType.PushNotifications, _entitlementFileName);
             return this;
         }
