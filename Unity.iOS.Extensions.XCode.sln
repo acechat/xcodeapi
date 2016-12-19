@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.iOS.Extensions.XCode", "Xcode/Unity.iOS.Extensions.XCode.csproj", "{2301D70B-617E-49AB-97B4-0BF15CF8E167}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2301D70B-617E-49AB-97B4-0BF15CF8E167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2301D70B-617E-49AB-97B4-0BF15CF8E167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Xcode/Unity.iOS.Extensions.XCode.csproj
+	EndGlobalSection
+EndGlobal
