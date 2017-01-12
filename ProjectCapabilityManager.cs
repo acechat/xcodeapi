@@ -152,14 +152,14 @@ namespace UnityEditor.iOS.Xcode
         public ProjectCapabilityManager AddWallet(string[] passSubset)
         {
             var arr = (getOrCreateEntitlementDoc().root[WalletEnt.Key] = new PlistElementArray()) as PlistElementArray;
-	        if ((passSubset == null || passSubset.Length == 0) && arr != null)
-		        arr.values.Add(new PlistElementString(WalletEnt.BaseValue + WalletEnt.BaseValue));
+            if ((passSubset == null || passSubset.Length == 0) && arr != null)
+                arr.values.Add(new PlistElementString(WalletEnt.BaseValue + WalletEnt.BaseValue));
             else
             {
-	            for (var i = 0; i < passSubset.Length; i++)
-	            {
-		            if (arr != null) arr.values.Add(new PlistElementString(WalletEnt.BaseValue+passSubset[i]));
-	            }
+                for (var i = 0; i < passSubset.Length; i++)
+                {
+                    if (arr != null) arr.values.Add(new PlistElementString(WalletEnt.BaseValue+passSubset[i]));
+                }
             }
 
             PBXProject.EnableCapability(PBXCapabilitiesType.Wallet, _entitlementFileName);
@@ -525,16 +525,16 @@ namespace UnityEditor.iOS.Xcode
     [Serializable]
     public enum BackgroundModesOptions
     {
-	    None                           = 0,
-	    AudioAirplayPiP                = 1<<0,
-	    LocationUpdates                = 1<<1,
-	    VoiceOverIp                    = 1<<2,
-	    NewsstandDownloads             = 1<<3,
-	    ExternalAccessoryCommunication = 1<<4,
-	    UsesBluetoothLEAccessory       = 1<<5,
-	    ActsAsABluetoothLEAccessory    = 1<<6,
-	    BackgroundFetch                = 1<<7,
-	    RemoteNotifications            = 1<<8
+        None                           = 0,
+        AudioAirplayPiP                = 1<<0,
+        LocationUpdates                = 1<<1,
+        VoiceOverIp                    = 1<<2,
+        NewsstandDownloads             = 1<<3,
+        ExternalAccessoryCommunication = 1<<4,
+        UsesBluetoothLEAccessory       = 1<<5,
+        ActsAsABluetoothLEAccessory    = 1<<6,
+        BackgroundFetch                = 1<<7,
+        RemoteNotifications            = 1<<8
     }
 
     /// <summary>
@@ -545,19 +545,19 @@ namespace UnityEditor.iOS.Xcode
     [Flags]
     public enum MapsOptions
     {
-	    None          = 0,
-	    Airplane      = 1<<0,
-	    Bike          = 1<<1,
-	    Bus           = 1<<2,
-	    Car           = 1<<3,
-	    Ferry         = 1<<4,
-	    Pedestrian    = 1<<5,
-	    RideSharing   = 1<<6,
-	    StreetCar     = 1<<7,
-	    Subway        = 1<<8,
-	    Taxi          = 1<<9,
-	    Train         = 1<<10,
-	    Other         = 1<<11
+        None          = 0,
+        Airplane      = 1<<0,
+        Bike          = 1<<1,
+        Bus           = 1<<2,
+        Car           = 1<<3,
+        Ferry         = 1<<4,
+        Pedestrian    = 1<<5,
+        RideSharing   = 1<<6,
+        StreetCar     = 1<<7,
+        Subway        = 1<<8,
+        Taxi          = 1<<9,
+        Train         = 1<<10,
+        Other         = 1<<11
     }
 
 

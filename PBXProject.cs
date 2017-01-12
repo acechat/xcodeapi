@@ -294,16 +294,16 @@ namespace UnityEditor.iOS.Xcode
             AddBuildFileImpl(targetGuid, fileGuid, weak, null);
         }
 
-	    /// The framework must be specified with the '.framework' extension
-	    // FIXME: targetGuid is ignored at the moment
-	    public void RemoveFrameworkFromProject(string targetGuid, string framework)
-	    {
-		    string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/"+framework);
-		    if (fileGuid != null)
-			    RemoveFile(fileGuid);
-	    }
+        /// The framework must be specified with the '.framework' extension
+        // FIXME: targetGuid is ignored at the moment
+        public void RemoveFrameworkFromProject(string targetGuid, string framework)
+        {
+            string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/"+framework);
+            if (fileGuid != null)
+                RemoveFile(fileGuid);
+        }
 
-	    /// <summary>
+        /// <summary>
         /// Allow user to enable Capability,
         /// by adding the proper id,
         /// checking and adding the entitlements file to Code signing entitlements if needed
@@ -345,30 +345,30 @@ namespace UnityEditor.iOS.Xcode
             if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
             {
                 if (p.capabilities.Count > 0)
-	                if(!silentFail)throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
+                    if(!silentFail)throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
                     return false;
             }
 
 
             // add the capability only if it doesn't already exist.
-	        if (p.capabilities.Contains(capability))
-	        {
-		        if(!silentFail)throw new WarningException("This capability has already been added. Method ignored");
-		        return false;
-	        }
+            if (p.capabilities.Contains(capability))
+            {
+                if(!silentFail)throw new WarningException("This capability has already been added. Method ignored");
+                return false;
+            }
 
             var targetGuid = TargetGuidByName(targetName);
 
-			p.capabilities.Add(capability);
-			p.UpdateCapabilities(targetGuid);
-			// add the required framework.
-			if (capability.Framework != "" && !capability.OptionalFramework ||
-				(capability.Framework != "" && capability.OptionalFramework && addOptionalFramework))
-			{
-				AddFrameworkToProject(targetGuid, capability.Framework, false);
-			}
+            p.capabilities.Add(capability);
+            p.UpdateCapabilities(targetGuid);
+            // add the required framework.
+            if (capability.Framework != "" && !capability.OptionalFramework ||
+                (capability.Framework != "" && capability.OptionalFramework && addOptionalFramework))
+            {
+                AddFrameworkToProject(targetGuid, capability.Framework, false);
+            }
 
-	        // finally add the entitlement code signing if it wasn't added before.
+            // finally add the entitlement code signing if it wasn't added before.
             if (entitlementFileName != "" && p.entitlementsFile == null)
             {
                 p.entitlementsFile = entitlementFileName;
