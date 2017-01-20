@@ -435,11 +435,41 @@ namespace UnityEditor.iOS.Xcode
             var res = new List<string>();
             foreach (var guid in gr.children)
             {
-                var fileRef = FileRefsGet(guid);
+                PBXFileReferenceData fileRef = FileRefsGet(guid);
                 if (fileRef != null)
                     res.Add(fileRef.name);
             }
             return res;
+        }
+
+        // Returns an empty dictionary if no group or files are found
+        internal HashSet<string> GetGroupChildrenFilesRefs(string projectPath)
+        {
+            projectPath = PBXPath.FixSlashes(projectPath);
+            PBXGroupData gr = GroupsGetByProjectPath(projectPath);
+            if (gr == null)
+                return new HashSet<string>();
+            HashSet<string> res = new HashSet<string>();
+            foreach (var guid in gr.children)
+            {
+                PBXFileReferenceData fileRef = FileRefsGet(guid);
+                if (fileRef != null)
+                    res.Add(fileRef.path);
+            }
+            return res == null ? new HashSet<string> () : res;
+        }
+
+        internal HashSet<string> GetFileRefsByProjectPaths(IEnumerable<string> paths)
+        {
+            HashSet<string> ret = new HashSet<string>();
+            foreach (string path in paths)
+            {
+                string fixedPath = PBXPath.FixSlashes(path);
+                var fileRef = FileRefsGetByProjectPath(fixedPath);
+                if (fileRef != null)
+                    ret.Add(fileRef.path);
+            }
+            return ret;
         }
 
         private PBXGroupData GetPBXGroupChildByName(PBXGroupData group, string name)
