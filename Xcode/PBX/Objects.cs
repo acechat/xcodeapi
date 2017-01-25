@@ -642,7 +642,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         // enclosed in quotes.
         static string EscapeWithQuotesIfNeeded(string name, string value)
         {
-            if (name != "LIBRARY_SEARCH_PATHS")
+            if (name != "LIBRARY_SEARCH_PATHS" && name != "FRAMEWORK_SEARCH_PATHS")
                 return value;
             if (!value.Contains(" "))
                 return value;
