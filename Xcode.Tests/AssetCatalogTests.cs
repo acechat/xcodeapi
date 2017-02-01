@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor.iOS.Xcode;
 
-namespace Unity.PureCSharpTests.iOSExtensions
+namespace UnityEditor.iOS.Xcode
 {
 
     [TestFixture]
@@ -266,4 +266,4 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
     }
 
-} // namespace Unity.PureCSharpTests.iOSExtensions
+} // namespace UnityEditor.iOS.Xcode
