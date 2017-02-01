@@ -905,11 +905,6 @@ namespace UnityEditor.iOS.Xcode
             return project.project;
         }
 
-        internal PBXProjectObjectData GetProjectInternal()
-        {
-            return project.project;
-        }
-
         /*
          * Allows the setting of target attributes in the project section such as Provisioning Style and Team ID for each target
          *
