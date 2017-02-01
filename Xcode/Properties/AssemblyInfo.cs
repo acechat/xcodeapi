@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 // Show the internal functions to the tests
-[assembly: InternalsVisibleTo("Unity.PureCSharpTests")]
-[assembly: InternalsVisibleTo("UnityEditor.iOS.Extensions")]
+[assembly: InternalsVisibleTo("Xcode.Tests")]
+
