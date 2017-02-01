@@ -5,14 +5,14 @@ using System.IO;
 using System;
 using UnityEditor.iOS.Xcode.PBX;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityEditor.iOS.Xcode.Extensions
 {
     /*  This class implements a number of static methods for performing common tasks
         on xcode projects. 
         TODO: Make sure enough stuff is exposed so that it's possible to perform the tasks
         without using internal APIs
     */
-    public class PBXProjectHelpers
+    public static class PBXProjectExtensions
     {
         // Create a wrapper class so that collection initializers work and we can have a 
         // compact notation. Note that we can't use Dictionary because the keys may be duplicate
@@ -198,44 +198,47 @@ namespace UnityEditor.iOS.Xcode
             { "SUPPORTED_PLATFORMS", "watchsimulator" },
         };
 
-        static void SetBuildFlagsFromDict(PBXProject proj, string configGuid, IEnumerable<KeyValuePair<string, string>> data)
+        static void SetBuildFlagsFromDict(this PBXProject proj, string configGuid, IEnumerable<KeyValuePair<string, string>> data)
         {
             foreach (var kv in data)
                 proj.AddBuildPropertyForConfig(configGuid, kv.Key, kv.Value);
         }
 
-        public static void SetDefaultAppExtensionReleaseBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultAppExtensionReleaseBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, appExtensionReleaseBuildFlags);
         }
 
-        public static void SetDefaultAppExtensionDebugBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultAppExtensionDebugBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, appExtensionDebugBuildFlags);
         }
 
-        public static void SetDefaultWatchExtensionReleaseBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultWatchExtensionReleaseBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, watchExtensionReleaseBuildFlags);
         }
 
-        public static void SetDefaultWatchExtensionDebugBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultWatchExtensionDebugBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, watchExtensionDebugBuildFlags);
         }
 
-        public static void SetDefaultWatchAppReleaseBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultWatchAppReleaseBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, watchAppReleaseBuildFlags);
         }
 
-        public static void SetDefaultWatchAppDebugBuildFlags(PBXProject proj, string configGuid)
+        public static void SetDefaultWatchAppDebugBuildFlags(this PBXProject proj, string configGuid)
         {
             SetBuildFlagsFromDict(proj, configGuid, watchAppDebugBuildFlags);
         }
 
-        // Returns the guid of the new target
-        public static string AddAppExtension(PBXProject proj, string mainTarget, 
+        /* Creates a new app extension. 
+
+            Returns the guid of the new target
+        */
+        public static string AddAppExtension(this PBXProject proj, string mainTarget, 
                                              string name, string infoPlistPath)
         {
             string ext = ".appex";
@@ -262,7 +265,7 @@ namespace UnityEditor.iOS.Xcode
         }
 
         // Returns the guid of the new target
-        public static string AddWatchApp(PBXProject proj, string mainTargetGuid, string watchExtensionTargetGuid, 
+        public static string AddWatchApp(this PBXProject proj, string mainTargetGuid, string watchExtensionTargetGuid, 
                                          string name, string bundleId, string infoPlistPath)
         {
             var newTargetGuid = proj.AddTarget(name, ".app", "com.apple.product-type.application.watchapp2");
@@ -293,7 +296,7 @@ namespace UnityEditor.iOS.Xcode
             return newTargetGuid;
         }
 
-        public static string AddWatchExtension(PBXProject proj, string mainTarget, 
+        public static string AddWatchExtension(this PBXProject proj, string mainTarget, 
                                                string name, string bundleId, string infoPlistPath)
         {
             var newTargetGuid = proj.AddTarget(name, ".appex", "com.apple.product-type.watchkit2-extension");
@@ -314,7 +317,5 @@ namespace UnityEditor.iOS.Xcode
 
             return newTargetGuid;
         }
-
-        
     }
 } // namespace UnityEditor.iOS.Xcode
