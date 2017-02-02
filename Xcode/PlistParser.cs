@@ -326,7 +326,8 @@ namespace UnityEditor.iOS.Xcode
 
         public void WriteToFile(string path)
         {
-            File.WriteAllText(path, WriteToString());
+            System.Text.Encoding utf8WithoutBom = new System.Text.UTF8Encoding(false);
+            File.WriteAllText(path, WriteToString(), utf8WithoutBom);
         }
 
         public void WriteToStream(TextWriter tw)
@@ -343,7 +344,7 @@ namespace UnityEditor.iOS.Xcode
 
             var doc = new XDocument();
             doc.Add(rootEl);
-            return CleanDtdToString(doc);
+            return CleanDtdToString(doc).Replace("\r\n", "\n");
         }
     }
 
