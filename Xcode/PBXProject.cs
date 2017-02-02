@@ -304,39 +304,36 @@ namespace UnityEditor.iOS.Xcode
         }
 
         /// <summary>
-        /// Allow user to enable Capability,
+        /// Allow user to enable a Capability
         /// by adding the proper id,
-        /// checking and adding the entitlements file to Code signing entitlements if needed
-        /// and adding the proper framework if required
+        /// checking and adding the entitlements file to Code Signing entitlements
+        /// and adding the proper framework if required.
         /// </summary>
         ///
-        /// <param name="capability">A PBXCapabilitiesType repesenting the capability to add</param>
+        /// <param name="capability">A PBXCapabilitiesType representing the capability to add.</param>
         ///
         /// <param name="entitlementFileName">
-        /// Paramter mandatory if the capability requires an entitlement.
-        /// This file is usualy called [product name].entitlements
-        /// If this is required and it's not provided the capability will not be added.
+        /// Parameter is mandatory if the capability requires an entitlement.
+        /// This file is usually called [product name].entitlements
         /// </param>
         ///
         /// <param name="addOptionalFramework">
-        /// Some capabilities requires framework to be added,
-        /// and some of these capabilities requires framework to be added only for specific options (Yes! I'm looking at you iCloud).
-        /// This parameters let you define if you enabled this option.
+        /// Some capabilities need additional frameworks depending upon their specific options.
+        /// This parameter lets you define if optional frameworks are required.
         /// </param>
         ///
         /// <param name="targetName">
-        /// The target name to find the targetGUIDbyName.
-        /// This target name should mostly never be changed.
+        /// The Xcode target name to enable this Capability on.
+        /// This does not usually need to be changed.
         /// </param>
         ///
         /// <returns>A bool representing if the capability has been added or not.</returns>
-        public bool EnableCapability(PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = "Unity-iPhone", bool silentFail = false)
+        public bool EnableCapability(string targetGuid, PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = "Unity-iPhone", bool silentFail = false)
         {
-
             // if the capability requires entitlements then you have to provide the name of it or we don't add the capability.
             if (capability.RequiresEntitlements && entitlementFileName == "" || entitlementFileName == null)
             {
-                if(!silentFail)throw new Exception("Couldn't add The iOS Capability " + capability.Id + "to the PBXProject file, because this capability requires an entitlement file.");
+                if(!silentFail) throw new Exception("Couldn't add the Xcode Capability " + capability.Id + " to the PBXProject file because this capability requires an entitlement file.");
                 return false;
             }
             var p = project.project;
@@ -345,7 +342,7 @@ namespace UnityEditor.iOS.Xcode
             if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
             {
                 if (p.capabilities.Count > 0)
-                    if(!silentFail)throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
+                    if(!silentFail) throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
                     return false;
             }
 
@@ -353,11 +350,11 @@ namespace UnityEditor.iOS.Xcode
             // add the capability only if it doesn't already exist.
             if (p.capabilities.Contains(capability))
             {
-                if(!silentFail)throw new WarningException("This capability has already been added. Method ignored");
+                if(!silentFail) throw new WarningException("This capability has already been added. Method ignored");
                 return false;
             }
 
-            var targetGuid = TargetGuidByName(targetName);
+            //var targetGuid = TargetGuidByName(targetName);
 
             p.capabilities.Add(capability);
             p.UpdateCapabilities(targetGuid);
@@ -373,23 +370,22 @@ namespace UnityEditor.iOS.Xcode
             {
                 p.entitlementsFile = entitlementFileName;
                 AddFileImpl(targetName +"/" + entitlementFileName,  entitlementFileName, PBXSourceTree.Source, false);
-                SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Debug"), "CODE_SIGN_ENTITLEMENTS", targetName+"/" + entitlementFileName);
-                SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Release"), "CODE_SIGN_ENTITLEMENTS", targetName+"/" + entitlementFileName);
+                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName);
+                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName);
             }
             return true;
         }
 
         /// <summary>
-        /// The xcode project need a team set to be able to compile or to add some capabilities.
-        /// this method allow you to set it.
+        /// The Xcode project needs a team set to be able to complete code signing or to add some capabilities.
+        /// This method allows you to set it.
         /// </summary>
         /// <param name="teamId">The team id that you can find https://developer.apple.com/account/#/membership/</param>
-        /// <param name="targetName">The target name, by default with unity target name.</param>
-        public void SetTeamId(string teamId, string targetName = "Unity-iPhone")
+        /// <param name="targetName">The target name, by default with Unity target name.</param>
+        public void SetTeamId(string targetGuid, string teamId, string targetName = "Unity-iPhone")
         {
-            var targetGuid = TargetGuidByName(targetName);
-            SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Debug"), "DEVELOPMENT_TEAM", teamId);
-            SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Release"), "DEVELOPMENT_TEAM", teamId);
+            SetBuildProperty(targetGuid, "DEVELOPMENT_TEAM", teamId);
+            SetBuildProperty(targetGuid, "DEVELOPMENT_TEAM", teamId);
             project.project.UpdateTeamId(teamId, targetGuid);
         }
 
@@ -1015,15 +1011,21 @@ namespace UnityEditor.iOS.Xcode
             PBXElementDict properties = project.project.GetPropertiesRaw();
             PBXElementDict attributes;
             PBXElementDict targetAttributes;
-            if (properties.Contains("attributes")) {
+            if (properties.Contains("attributes"))
+			{
                 attributes = properties["attributes"] as PBXElementDict;
-            } else {
+            }
+			else
+			{
                 attributes = properties.CreateDict("attributes");
             }
 
-            if (attributes.Contains("TargetAttributes")) {
+            if (attributes.Contains("TargetAttributes"))
+			{
                 targetAttributes = attributes["TargetAttributes"] as PBXElementDict;
-            } else {
+            } 
+			else
+			{
                 targetAttributes = attributes.CreateDict("TargetAttributes");
             }
 
@@ -1032,7 +1034,9 @@ namespace UnityEditor.iOS.Xcode
                 if (targetAttributes.Contains(target.Key))
                 {
                     targetAttributesRaw = targetAttributes[target.Key].AsDict();
-                } else {
+                }
+				else
+				{
                     targetAttributesRaw = targetAttributes.CreateDict(target.Key);
                 }
                 targetAttributesRaw.SetString(key, value); 
