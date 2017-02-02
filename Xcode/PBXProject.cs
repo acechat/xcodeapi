@@ -284,13 +284,13 @@ namespace UnityEditor.iOS.Xcode
 
         public bool HasFramework(string framework)
         {
-            return ContainsFileByRealPath("System/Library/Frameworks/"+framework);
+            return ContainsFileByRealPath("System/Library/Frameworks/" + framework);
         }
 
         /// The framework must be specified with the '.framework' extension
         public void AddFrameworkToProject(string targetGuid, string framework, bool weak)
         {
-            string fileGuid = AddFile("System/Library/Frameworks/"+framework, "Frameworks/"+framework, PBXSourceTree.Sdk);
+            string fileGuid = AddFile("System/Library/Frameworks/" + framework, "Frameworks/" + framework, PBXSourceTree.Sdk);
             AddBuildFileImpl(targetGuid, fileGuid, weak, null);
         }
 
@@ -298,7 +298,7 @@ namespace UnityEditor.iOS.Xcode
         // FIXME: targetGuid is ignored at the moment
         public void RemoveFrameworkFromProject(string targetGuid, string framework)
         {
-            string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/"+framework);
+            string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/" + framework);
             if (fileGuid != null)
                 RemoveFile(fileGuid);
         }
@@ -342,7 +342,7 @@ namespace UnityEditor.iOS.Xcode
             if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
             {
                 if (p.capabilities.Count > 0)
-                    if(!silentFail) throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
+                    if(!silentFail) throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : " + p.entitlementsFile);
                     return false;
             }
 
@@ -369,9 +369,9 @@ namespace UnityEditor.iOS.Xcode
             if (entitlementFileName != "" && p.entitlementsFile == null)
             {
                 p.entitlementsFile = entitlementFileName;
-                AddFileImpl(targetName +"/" + entitlementFileName,  entitlementFileName, PBXSourceTree.Source, false);
-                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName);
-                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName);
+                AddFileImpl(targetName + "/" + entitlementFileName,  entitlementFileName, PBXSourceTree.Source, false);
+                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName.Replace("\\", "/"));
+                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName.Replace("\\", "/"));
             }
             return true;
         }
