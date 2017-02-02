@@ -13,7 +13,7 @@ sourceTree=SDKROOT;};
 D82DCFBB0E8000A5005D6AD8={isa=PBXFileReference;fileEncoding=4;lastKnownFileType=sourcecode.cpp.objcpp;name=main.mm;path=Classes/main.mm;sourceTree=SOURCE_ROOT;};
 1D60588F0D05DD3D006BFB54={isa=PBXFrameworksBuildPhase;buildActionMask=2147483647;
 files=(08B24F76137BFDFA00FBA309,);runOnlyForDeploymentPostprocessing=0;};
-19C28FACFE9D520D11CA2CBB={isa   =    PBXGroup;children=(    1D6058910D05DD3D006BFB54,);name=Products;sourceTree="<group>";};
+19C28FACFE9D520D11CA2CBB={isa   =	PBXGroup;children=(	1D6058910D05DD3D006BFB54,);name=Products;sourceTree="<group>";};
 29B97314FDCFA39411CA2CEA={
 isa=PBXGroup;
 children=(

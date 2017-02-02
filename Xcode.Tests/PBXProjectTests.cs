@@ -316,5 +316,38 @@ namespace UnityEditor.iOS.Xcode
 
             TestOutput(proj, "dup1.pbxproj");
         }
+
+        [Test]
+        public void AddCapabilityWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            proj.EnableCapability(target, PBXCapabilitiesType.GameCenter);
+            File.WriteAllText("PBXProjectTestOutput/add_capability.pbxproj", proj.WriteToString());
+            TestOutput(proj, "add_capability.pbxproj");
+        }
+        
+        [Test]
+        public void AddCapabilityWithEntitlementWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            proj.EnableCapability(target, PBXCapabilitiesType.iCloud, Path.Combine(GetTestSourcePath(), "test.entitlements"));
+            File.WriteAllText("PBXProjectTestOutput/add_capability_entitlement.pbxproj", proj.WriteToString());
+            TestOutput(proj, "add_capability_entitlement.pbxproj");
+        }        
+
+        [Test]
+        public void SetTeamIdWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            proj.SetTeamId(target, "Z6SFPV59E3");
+            File.WriteAllText("PBXProjectTestOutput/set_teamid.pbxproj", proj.WriteToString());
+            TestOutput(proj, "set_teamid.pbxproj");
+        }        
     }
 }
