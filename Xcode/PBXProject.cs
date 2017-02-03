@@ -328,8 +328,12 @@ namespace UnityEditor.iOS.Xcode
         /// </param>
         ///
         /// <returns>A bool representing if the capability has been added or not.</returns>
-        public bool EnableCapability(string targetGuid, PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = "Unity-iPhone", bool silentFail = false)
+        public bool EnableCapability(string targetGuid, PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = null, bool silentFail = false)
         {
+            // Use the default Unity target name if none is provided
+            if (targetName == null)
+                targetName = GetUnityTargetName();
+
             // if the capability requires entitlements then you have to provide the name of it or we don't add the capability.
             if (capability.RequiresEntitlements && entitlementFileName == "" || entitlementFileName == null)
             {

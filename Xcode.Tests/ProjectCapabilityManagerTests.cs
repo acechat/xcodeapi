@@ -90,7 +90,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddiCloud();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -106,7 +106,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddPushNotifications();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -122,7 +122,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddGameCenter();
-            capManager.Close();
+            capManager.WriteToFile();
 
             TestOutputProject(capManager.PBXProject, "add_gamecenter.pbxproj");
             TestOutput("Info.plist", "add_gamecenter.plist");
@@ -136,7 +136,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddWallet(new string[] {"test1", "test2"});
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -152,7 +152,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddSiri();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -168,7 +168,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddApplePay(new string[] {"test1", "test2"});
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -184,7 +184,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddInAppPurchase();
-            capManager.Close();
+            capManager.WriteToFile();
 
             TestOutputProject(capManager.PBXProject, "add_iap.pbxproj");
         }
@@ -197,7 +197,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddMaps(MapsOptions.Airplane);
-            capManager.Close();
+            capManager.WriteToFile();
 
             TestOutputProject(capManager.PBXProject, "add_maps.pbxproj");
             TestOutput("Info.plist", "add_maps.plist");
@@ -211,7 +211,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddPersonalVPN();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -227,7 +227,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddBackgroundModes(BackgroundModesOptions.BackgroundFetch);
-            capManager.Close();
+            capManager.WriteToFile();
 
             TestOutputProject(capManager.PBXProject, "add_backgroundmodes.pbxproj");
             TestOutput("Info.plist", "add_backgroundmodes.plist");
@@ -241,7 +241,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddKeychainSharing(new string[] {"test1", "test2"});
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -257,7 +257,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddInterAppAudio();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -273,7 +273,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddAssociatedDomains(new string[] {"webcredentials:example.com", "webcredentials:example2.com"});
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -289,7 +289,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddAppGroups(new string[] {"test1", "test2"});
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -305,7 +305,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddHomeKit();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -321,7 +321,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddDataProtection();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -337,7 +337,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddHealthKit();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 
@@ -354,7 +354,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
             var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
             capManager.AddWirelessAccessoryConfiguration();
-            capManager.Close();
+            capManager.WriteToFile();
 
             string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
 

@@ -10,7 +10,7 @@
  * PBXProject project = capabilityManager.AddPushNotifications().AddGameCenter().AddHomeKit().AddHealthKit().PBXProject;
  * capabilityManager.AddMaps(MapsOptions.Airplane | MapsOptions.Bike | MapsOptions.RideSharing);
  * project.SetTeamId(YourTeamIdFromAppleDeveloperConsole);
- * capabilityManager.Close();
+ * capabilityManager.WriteToFile();
  * \endcode
  *
  */
@@ -41,7 +41,7 @@ namespace UnityEditor.iOS.Xcode
         private PlistDocument entitlements;
         private PlistDocument infoPlist;
 
-        private bool _closed = false;
+        private bool _written = false;
 
         /// <summary>
         /// Convenience property to allow you to add more changes to the PBXProject while it's still open.
@@ -55,10 +55,15 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="buildPath"> the build path passed by the PostProcessBuild method</param>
         /// <param name="bundleId">The bundle Id of your application, can be returned by PlayerSettings.bundleIdentifier</param>
         /// <param name="targetName">The name of the target project by default unity produce a project named : Unity-iPhone</param>
-        public ProjectCapabilityManager(string buildPath, string entitlementFileName, string targetName = "Unity-iPhone" )
+        public ProjectCapabilityManager(string buildPath, string entitlementFileName, string targetName = null )
         {
+            // Use the default Unity target name if none is provided
+            if (targetName == null)
+                _targetName = PBXProject.GetUnityTargetName();
+            else
+                _targetName = targetName;
+            
             _buildPath = buildPath;
-            _targetName = targetName;
             _entitlementFileName = entitlementFileName;
             _entitlementFilePath = PBXPath.Combine(_buildPath, PBXPath.Combine(_targetName, _entitlementFileName));
             pbxProjectPath = PBXProject.GetPBXProjectPath(_buildPath);
@@ -71,17 +76,20 @@ namespace UnityEditor.iOS.Xcode
         /// Write the actual file to the disk.
         /// If you don't call this method nothing will change.
         /// </summary>
-        public void Close()
+        public void WriteToFile()
         {
             File.WriteAllText(pbxProjectPath, PBXProject.WriteToString());
-            if (entitlements != null)entitlements.WriteToFile(_entitlementFilePath);
-            if (infoPlist != null) infoPlist.WriteToFile(PBXPath.Combine(_buildPath, "Info.plist"));
-            _closed = true;
+            if (entitlements != null)
+                entitlements.WriteToFile(_entitlementFilePath);
+            if (infoPlist != null)
+                infoPlist.WriteToFile(PBXPath.Combine(_buildPath, "Info.plist"));
+            _written = true;
         }
 
         public void Dispose()
         {
-            if (!_closed) Close();
+            if (!_written)
+                WriteToFile();
             GC.SuppressFinalize(this);
         }
 
@@ -150,12 +158,15 @@ namespace UnityEditor.iOS.Xcode
         {
             var arr = (GetOrCreateEntitlementDoc().root[WalletEnt.Key] = new PlistElementArray()) as PlistElementArray;
             if ((passSubset == null || passSubset.Length == 0) && arr != null)
+            {
                 arr.values.Add(new PlistElementString(WalletEnt.BaseValue + WalletEnt.BaseValue));
+            }
             else
             {
                 for (var i = 0; i < passSubset.Length; i++)
                 {
-                    if (arr != null) arr.values.Add(new PlistElementString(WalletEnt.BaseValue+passSubset[i]));
+                    if (arr != null)
+                        arr.values.Add(new PlistElementString(WalletEnt.BaseValue+passSubset[i]));
                 }
             }
 
@@ -331,7 +342,8 @@ namespace UnityEditor.iOS.Xcode
         public ProjectCapabilityManager AddKeychainSharing(string[] accessGroups = null)
         {
             var arr = (GetOrCreateEntitlementDoc().root[KeyChainEnt.Key] = new PlistElementArray()) as PlistElementArray;
-            if(accessGroups != null){
+            if(accessGroups != null)
+            {
                 for (var i = 0; i < accessGroups.Length; i++)
                 {
                     arr.values.Add(new PlistElementString(accessGroups[i]));
@@ -503,8 +515,6 @@ namespace UnityEditor.iOS.Xcode
             }
             return r;
         }
-
-
     }
 
     /// <summary>
