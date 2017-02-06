@@ -303,44 +303,21 @@ namespace UnityEditor.iOS.Xcode
                 RemoveFile(fileGuid);
         }
 
-        /// <summary>
-        /// Allow user to enable a Capability
-        /// by adding the proper id,
-        /// checking and adding the entitlements file to Code Signing entitlements
-        /// and adding the proper framework if required.
-        /// </summary>
-        ///
-        /// <param name="capability">A PBXCapabilitiesType representing the capability to add.</param>
-        ///
-        /// <param name="entitlementFileName">
-        /// Parameter is mandatory if the capability requires an entitlement.
-        /// This file is usually called [product name].entitlements
-        /// </param>
-        ///
-        /// <param name="addOptionalFramework">
-        /// Some capabilities need additional frameworks depending upon their specific options.
-        /// This parameter lets you define if optional frameworks are required.
-        /// </param>
-        ///
-        /// <param name="targetName">
-        /// The Xcode target name to enable this Capability on.
-        /// This does not usually need to be changed.
-        /// </param>
-        ///
-        /// <returns>A bool representing if the capability has been added or not.</returns>
+        // Allow user to enable a Capability
         public bool EnableCapability(string targetGuid, PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = null, bool silentFail = false)
         {
             // Use the default Unity target name if none is provided
             if (targetName == null)
                 targetName = GetUnityTargetName();
 
-            // if the capability requires entitlements then you have to provide the name of it or we don't add the capability.
+            // If the capability requires entitlements then you have to provide the name of it or we don't add the capability.
             if (capability.RequiresEntitlements && entitlementFileName == "" || entitlementFileName == null)
             {
                 if(!silentFail) throw new Exception("Couldn't add the Xcode Capability " + capability.Id + " to the PBXProject file because this capability requires an entitlement file.");
                 return false;
             }
             var p = project.project;
+
             // If an entitlement with a different name was added for another capability
             // we don't add this capacity.
             if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
@@ -350,26 +327,24 @@ namespace UnityEditor.iOS.Xcode
                     return false;
             }
 
-
-            // add the capability only if it doesn't already exist.
+            // Add the capability only if it doesn't already exist.
             if (p.capabilities.Contains(capability))
             {
                 if(!silentFail) throw new WarningException("This capability has already been added. Method ignored");
                 return false;
             }
 
-            //var targetGuid = TargetGuidByName(targetName);
-
             p.capabilities.Add(capability);
             p.UpdateCapabilities(targetGuid);
-            // add the required framework.
+
+            // Add the required framework.
             if (capability.Framework != "" && !capability.OptionalFramework ||
                 (capability.Framework != "" && capability.OptionalFramework && addOptionalFramework))
             {
                 AddFrameworkToProject(targetGuid, capability.Framework, false);
             }
 
-            // finally add the entitlement code signing if it wasn't added before.
+            // Finally add the entitlement code signing if it wasn't added before.
             if (entitlementFileName != "" && p.entitlementsFile == null)
             {
                 p.entitlementsFile = entitlementFileName;
@@ -380,12 +355,7 @@ namespace UnityEditor.iOS.Xcode
             return true;
         }
 
-        /// <summary>
-        /// The Xcode project needs a team set to be able to complete code signing or to add some capabilities.
-        /// This method allows you to set it.
-        /// </summary>
-        /// <param name="teamId">The team id that you can find https://developer.apple.com/account/#/membership/</param>
-        /// <param name="targetName">The target name, by default with Unity target name.</param>
+        // The Xcode project needs a team set to be able to complete code signing or to add some capabilities.
         public void SetTeamId(string targetGuid, string teamId, string targetName = "Unity-iPhone")
         {
             SetBuildProperty(targetGuid, "DEVELOPMENT_TEAM", teamId);
