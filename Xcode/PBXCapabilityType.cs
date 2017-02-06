@@ -24,29 +24,29 @@
         public static readonly PBXCapabilityType Wallet = new PBXCapabilityType ("com.apple.Wallet", true, "PassKit.framework");
         public static readonly PBXCapabilityType WirelessAccessoryConfiguration = new PBXCapabilityType("com.apple.WAC", true, "ExternalAccessory.framework");
 
-        private readonly string _id;
-        private readonly bool _requiresEntitlements;
-        private readonly string _framework;
-        private readonly bool _optionalFramework;
+        private readonly string m_ID;
+        private readonly bool m_RequiresEntitlements;
+        private readonly string m_Framework;
+        private readonly bool m_OptionalFramework;
 
         public bool OptionalFramework
         {
-            get { return _optionalFramework; }
+            get { return m_OptionalFramework; }
         }
 
         public string Framework
         {
-            get { return _framework; }
+            get { return m_Framework; }
         }
 
         public string Id
         {
-            get { return _id; }
+            get { return m_ID; }
         }
 
         public bool RequiresEntitlements
         {
-            get { return _requiresEntitlements; }
+            get { return m_RequiresEntitlements; }
         }
 
         /// <summary>
@@ -59,10 +59,10 @@
         /// this parameter indicates if one of them is checked.</param>
         private PBXCapabilityType(string id, bool requiresEntitlements, string framework = "", bool optionalFramework = false)
         {
-            _id = id;
-            _requiresEntitlements = requiresEntitlements;
-            _framework = framework;
-            _optionalFramework = optionalFramework;
+            m_ID = id;
+            m_RequiresEntitlements = requiresEntitlements;
+            m_Framework = framework;
+            m_OptionalFramework = optionalFramework;
         }
     }
 }
