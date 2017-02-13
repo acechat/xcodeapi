@@ -1,121 +1,79 @@
-/* \mainpage XCodeAPI
- * \section intro Introduction
- * This package allow you to modify the Xcode project, especially to add capabilities.
- * It's a modification and an extentions of the package provided by Unity.
- *
- * \section usage Usage
- * To use it create a ProjectCapabilityManager and add capabilities :
- * \code{.csharp}
- * var capabilityManager = new ProjectCapabilityManager(buildPath, PlayerSettings.bundleIdentifier);
- * PBXProject project = capabilityManager.AddPushNotifications().AddGameCenter().AddHomeKit().AddHealthKit().PBXProject;
- * capabilityManager.AddMaps(MapsOptions.Airplane | MapsOptions.Bike | MapsOptions.RideSharing);
- * project.SetTeamId(YourTeamIdFromAppleDeveloperConsole);
- * capabilityManager.WriteToFile();
- * \endcode
- *
- */
-
 using System;
 using System.IO;
 
 namespace UnityEditor.iOS.Xcode
 {
-    // This class is here to help you add capabilities to your xcode project.
+    // This class is here to help you add capabilities to your Xcode project.
     // Because capabilities modify the PBXProject, the entitlements file and/or the Info.plist and not consistently,
     // it can be tedious.
     // Therefore this class open the PBXProject that is always modify by capabilities and open Entitlement and info.plist only when needed.
     // For optimisation reasons, we write the file only in the close method.
     // If you don't call it the file will not be written.
-    //
-    // For convenience and to keep the optimisation you can access the open PBXProject directly.
-    public class ProjectCapabilityManager : IDisposable
+    public class ProjectCapabilityManager
     {
-        private readonly string _buildPath;
-        private readonly string _targetName;
-        private readonly string _targetGuid;
-        private readonly string pbxProjectPath;
-        private readonly string _entitlementFileName;
-        private readonly string _entitlementFilePath;
-        private PlistDocument entitlements;
-        private PlistDocument infoPlist;
-
-        private bool _written = false;
-
-        // Convenience property to allow you to add more changes to the PBXProject while it's still open.
-        public readonly PBXProject PBXProject;
+        private readonly string m_BuildPath;
+        private readonly string m_TargetGuid;
+        private readonly string m_PBXProjectPath;
+        private readonly string m_EntitlementFilePath;
+        private PlistDocument m_Entitlements;
+        private PlistDocument m_InfoPlist;
+        protected internal PBXProject project;
 
         // Create the manager with the required parameter to open files and set the properties in the write place.
-        public ProjectCapabilityManager(string buildPath, string entitlementFileName, string targetName = null )
+        public ProjectCapabilityManager(string pbxProjectPath, string entitlementFilePath, string targetName)
         {
-            // Use the default Unity target name if none is provided
-            if (targetName == null)
-                _targetName = PBXProject.GetUnityTargetName();
-            else
-                _targetName = targetName;
-            
-            _buildPath = buildPath;
-            _entitlementFileName = entitlementFileName;
-            _entitlementFilePath = PBXPath.Combine(_buildPath, PBXPath.Combine(_targetName, _entitlementFileName));
-            pbxProjectPath = PBXProject.GetPBXProjectPath(_buildPath);
-            PBXProject = new PBXProject();
-            PBXProject.ReadFromString(File.ReadAllText(pbxProjectPath));
-            _targetGuid = PBXProject.TargetGuidByName (_targetName);
+            m_BuildPath = Directory.GetParent(Path.GetDirectoryName(pbxProjectPath)).FullName;
+
+            m_EntitlementFilePath = entitlementFilePath;
+            m_PBXProjectPath = pbxProjectPath;
+            project = new PBXProject();
+            project.ReadFromString(File.ReadAllText(m_PBXProjectPath));
+            m_TargetGuid = project.TargetGuidByName(targetName);
         }
 
         // Write the actual file to the disk.
         // If you don't call this method nothing will change.
         public void WriteToFile()
         {
-            File.WriteAllText(pbxProjectPath, PBXProject.WriteToString());
-            if (entitlements != null)
-                entitlements.WriteToFile(_entitlementFilePath);
-            if (infoPlist != null)
-                infoPlist.WriteToFile(PBXPath.Combine(_buildPath, "Info.plist"));
-            _written = true;
-        }
-
-        public void Dispose()
-        {
-            if (!_written)
-                WriteToFile();
-            GC.SuppressFinalize(this);
+            File.WriteAllText(m_PBXProjectPath, project.WriteToString());
+            if (m_Entitlements != null)
+                m_Entitlements.WriteToFile(PBXPath.Combine(m_BuildPath, m_EntitlementFilePath));
+            if (m_InfoPlist != null)
+                m_InfoPlist.WriteToFile(PBXPath.Combine(m_BuildPath, "Info.plist"));
         }
 
         // Add the iCloud capability with the desired options.
-        public ProjectCapabilityManager AddiCloud(bool keyValueStorage = true, bool iCloudDocument = false, bool cloudKit = false, string[] customContainer = null)
+        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, string[] customContainers)
         {
             var ent = GetOrCreateEntitlementDoc();
-            var val = (ent.root[ICloudEnt.ContIdValue] = new PlistElementArray()) as PlistElementArray;
-            if (iCloudDocument || cloudKit)
+            var val = (ent.root[ICloudEntitlements.ContainerIdValue] = new PlistElementArray()) as PlistElementArray;
+            if (iCloudDocument)
             {
-                val.values.Add(new PlistElementString(ICloudEnt.ContIdValue));
-                var ser = (ent.root[ICloudEnt.ServicesKey] = new PlistElementArray()) as PlistElementArray;
-                if (cloudKit)
+                val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
+                var ser = (ent.root[ICloudEntitlements.ServicesKey] = new PlistElementArray()) as PlistElementArray;
+                ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
+                ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesDocValue));
+                var ubiquity = (ent.root[ICloudEntitlements.UbiquityContainerIdKey] = new PlistElementArray()) as PlistElementArray;
+                ubiquity.values.Add(new PlistElementString(ICloudEntitlements.UbiquityContainerIdValue));
+                for (var i = 0; i < customContainers.Length; i++)
                 {
-                    ser.values.Add(new PlistElementString(ICloudEnt.ServicesKitValue));
-                }
-                if (iCloudDocument)
-                {
-                    ser.values.Add(new PlistElementString(ICloudEnt.ServicesDocValue));
-                    var ubiquity = (ent.root[ICloudEnt.UbiContIdKey] = new PlistElementArray()) as PlistElementArray;
-                    ubiquity.values.Add(new PlistElementString(ICloudEnt.UbiContIdValue));
+                    ser.values.Add(new PlistElementString(customContainers[i]));
                 }
             }
 
             if (keyValueStorage)
             {
-                ent.root[ICloudEnt.KvStoreKey] = new PlistElementString(ICloudEnt.KvStoreValue);
+                ent.root[ICloudEntitlements.KeyValueStoreKey] = new PlistElementString(ICloudEntitlements.KeyValueStoreValue);
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.iCloud, _entitlementFileName, cloudKit);
-            return this;
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, iCloudDocument);
         }
 
         // Add Push (or remote) Notifications capability to your project
-        public void AddPushNotifications(bool development = true)
+        public void AddPushNotifications(bool development)
         {
-            GetOrCreateEntitlementDoc().root[PNEnt.Key] = new PlistElementString(development ? PNEnt.DevValue : PNEnt.ProdValue);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.PushNotifications, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[PushNotificationEntitlements.Key] = new PlistElementString(development ? PushNotificationEntitlements.DevelopmentValue : PushNotificationEntitlements.ProductionValue);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.PushNotifications, m_EntitlementFilePath);
         }
 
         // Add GameCenter capability to the project.
@@ -123,61 +81,61 @@ namespace UnityEditor.iOS.Xcode
         {
             var arr = (GetOrCreateInfoDoc().root[GameCenterInfo.Key] ?? (GetOrCreateInfoDoc().root[GameCenterInfo.Key] = new PlistElementArray())) as PlistElementArray;
             arr.values.Add(new PlistElementString(GameCenterInfo.Value));
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.GameCenter);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.GameCenter);
         }
 
         // Add Wallet capability to the project.
         public void AddWallet(string[] passSubset)
         {
-            var arr = (GetOrCreateEntitlementDoc().root[WalletEnt.Key] = new PlistElementArray()) as PlistElementArray;
+            var arr = (GetOrCreateEntitlementDoc().root[WalletEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
             if ((passSubset == null || passSubset.Length == 0) && arr != null)
             {
-                arr.values.Add(new PlistElementString(WalletEnt.BaseValue + WalletEnt.BaseValue));
+                arr.values.Add(new PlistElementString(WalletEntitlements.BaseValue + WalletEntitlements.BaseValue));
             }
             else
             {
                 for (var i = 0; i < passSubset.Length; i++)
                 {
                     if (arr != null)
-                        arr.values.Add(new PlistElementString(WalletEnt.BaseValue+passSubset[i]));
+                        arr.values.Add(new PlistElementString(WalletEntitlements.BaseValue + passSubset[i]));
                 }
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.Wallet, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.Wallet, m_EntitlementFilePath);
         }
 
         // Add Siri capability to the project.
         public void AddSiri()
         {
-            GetOrCreateEntitlementDoc().root[SiriEnt.Key] = new PlistElementBoolean(true);
+            GetOrCreateEntitlementDoc().root[SiriEntitlements.Key] = new PlistElementBoolean(true);
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.Siri, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.Siri, m_EntitlementFilePath);
         }
 
         // Add Apple Pay capability to the project.
         public void AddApplePay(string[] merchants)
         {
-            var arr = (GetOrCreateEntitlementDoc().root[AppPayEnt.Key] = new PlistElementArray()) as PlistElementArray;
+            var arr = (GetOrCreateEntitlementDoc().root[ApplePayEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
             for (var i = 0; i < merchants.Length; i++)
             {
                 arr.values.Add(new PlistElementString(merchants[i]));
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.ApplePay, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.ApplePay, m_EntitlementFilePath);
         }
 
         // Add In App Purchase capability to the project.
         public void AddInAppPurchase()
         {
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.InAppPurchase);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.InAppPurchase);
         }
 
         // Add Maps capability to the project.
-        public void AddMaps(MapsOptions options = MapsOptions.None)
+        public void AddMaps(MapsOptions options)
         {
             var bundleArr = (GetOrCreateInfoDoc().root[MapsInfo.BundleKey] ?? (GetOrCreateInfoDoc().root[MapsInfo.BundleKey] = new PlistElementArray())) as PlistElementArray;
             bundleArr.values.Add(new PlistElementDict());
-            PlistElementDict bundleDic = GetOrCreateUnicDictElementInArray(bundleArr);
+            PlistElementDict bundleDic = GetOrCreateUniqueDictElementInArray(bundleArr);
             bundleDic[MapsInfo.BundleNameKey] = new PlistElementString(MapsInfo.BundleNameValue);
             var bundleTypeArr = (bundleDic[MapsInfo.BundleTypeKey] ?? (bundleDic[MapsInfo.BundleTypeKey]  = new PlistElementArray())) as PlistElementArray;
             GetOrCreateStringElementInArray(bundleTypeArr, MapsInfo.BundleTypeValue);
@@ -233,64 +191,64 @@ namespace UnityEditor.iOS.Xcode
                 GetOrCreateStringElementInArray(optionArr, MapsInfo.ModeTrainValue);
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.Maps);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.Maps);
         }
 
         // Add Personal VPN capability to the project.
         public void AddPersonalVPN()
         {
-            var arr = (GetOrCreateEntitlementDoc().root[VPNEnt.Key] = new PlistElementArray()) as PlistElementArray;
-            arr.values.Add(new PlistElementString(VPNEnt.Value));
+            var arr = (GetOrCreateEntitlementDoc().root[VPNEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
+            arr.values.Add(new PlistElementString(VPNEntitlements.Value));
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.PersonalVPN, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.PersonalVPN, m_EntitlementFilePath);
         }
 
         // Add Background capability to the project with the options wanted.
-        public void AddBackgroundModes(BackgroundModesOptions options = BackgroundModesOptions.None)
+        public void AddBackgroundModes(BackgroundModesOptions options)
         {
-            var optionArr = (GetOrCreateInfoDoc().root[BGInfo.Key] ??
-                            (GetOrCreateInfoDoc().root[BGInfo.Key] = new PlistElementArray())) as PlistElementArray;
+            var optionArr = (GetOrCreateInfoDoc().root[BackgroundInfo.Key] ??
+                            (GetOrCreateInfoDoc().root[BackgroundInfo.Key] = new PlistElementArray())) as PlistElementArray;
 
             if ((options & BackgroundModesOptions.ActsAsABluetoothLEAccessory) == BackgroundModesOptions.ActsAsABluetoothLEAccessory)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeActsBluetoothValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeActsBluetoothValue);
             }
             if ((options & BackgroundModesOptions.AudioAirplayPiP) == BackgroundModesOptions.AudioAirplayPiP)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeAudioValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeAudioValue);
             }
             if ((options & BackgroundModesOptions.BackgroundFetch) == BackgroundModesOptions.BackgroundFetch)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeFetchValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeFetchValue);
             }
             if ((options & BackgroundModesOptions.ExternalAccessoryCommunication) == BackgroundModesOptions.ExternalAccessoryCommunication)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeExtAccessoryValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeExtAccessoryValue);
             }
             if ((options & BackgroundModesOptions.LocationUpdates) == BackgroundModesOptions.LocationUpdates)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeLocationValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeLocationValue);
             }
             if ((options & BackgroundModesOptions.NewsstandDownloads) == BackgroundModesOptions.NewsstandDownloads)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeNewsstandValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeNewsstandValue);
             }
             if ((options & BackgroundModesOptions.RemoteNotifications) == BackgroundModesOptions.RemoteNotifications)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModePushValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModePushValue);
             }
-            if ((options & BackgroundModesOptions.VoiceOverIp) == BackgroundModesOptions.VoiceOverIp)
+            if ((options & BackgroundModesOptions.VoiceOverIP) == BackgroundModesOptions.VoiceOverIP)
             {
-                GetOrCreateStringElementInArray(optionArr, BGInfo.ModeVOIPValue);
+                GetOrCreateStringElementInArray(optionArr, BackgroundInfo.ModeVOIPValue);
             }
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.BackgroundModes);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.BackgroundModes);
         }
 
         // Add Keychain Sharing capability to the project with a list of groups.
-        public void AddKeychainSharing(string[] accessGroups = null)
+        public void AddKeychainSharing(string[] accessGroups)
         {
-            var arr = (GetOrCreateEntitlementDoc().root[KeyChainEnt.Key] = new PlistElementArray()) as PlistElementArray;
-            if(accessGroups != null)
+            var arr = (GetOrCreateEntitlementDoc().root[KeyChainEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
+            if (accessGroups != null)
             {
                 for (var i = 0; i < accessGroups.Length; i++)
                 {
@@ -299,56 +257,55 @@ namespace UnityEditor.iOS.Xcode
             }
             else
             {
-                arr.values.Add(new PlistElementString(KeyChainEnt.DefaultValue));
+                arr.values.Add(new PlistElementString(KeyChainEntitlements.DefaultValue));
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.KeychainSharing, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.KeychainSharing, m_EntitlementFilePath);
         }
-
 
         // Add Inter App Audio capability to the project.
         public void AddInterAppAudio()
         {
-            GetOrCreateEntitlementDoc().root[AudioEnt.Key] = new PlistElementBoolean(true);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.InterAppAudio, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[AudioEntitlements.Key] = new PlistElementBoolean(true);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.InterAppAudio, m_EntitlementFilePath);
         }
 
         // Add Associated Domains capability to the project.
         public void AddAssociatedDomains(string[] domains)
         {
-            var arr = (GetOrCreateEntitlementDoc().root[AssDomEnt.Key] = new PlistElementArray()) as PlistElementArray;
+            var arr = (GetOrCreateEntitlementDoc().root[AssociatedDomainsEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
             for (var i = 0; i < domains.Length; i++)
             {
                 arr.values.Add(new PlistElementString(domains[i]));
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.AssociatedDomains, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.AssociatedDomains, m_EntitlementFilePath);
         }
 
         // Add App Groups capability to the project.
         public void AddAppGroups(string[] groups)
         {
-            var arr = (GetOrCreateEntitlementDoc().root[GroupsEnt.Key] = new PlistElementArray()) as PlistElementArray;
+            var arr = (GetOrCreateEntitlementDoc().root[AppGroupsEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
             for (var i = 0; i < groups.Length; i++)
             {
                 arr.values.Add(new PlistElementString(groups[i]));
             }
 
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.AppGroups, _entitlementFileName);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.AppGroups, m_EntitlementFilePath);
         }
 
         // Add HomeKit capability to the project.
         public void AddHomeKit()
         {
-            GetOrCreateEntitlementDoc().root[HomeEnt.Key] = new PlistElementBoolean(true);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.HomeKit, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[HomeKitEntitlements.Key] = new PlistElementBoolean(true);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.HomeKit, m_EntitlementFilePath);
         }
 
         // Add Data Protection capability to the project.
         public void AddDataProtection()
         {
-            GetOrCreateEntitlementDoc().root[ProtEnt.Key] = new PlistElementString(ProtEnt.Value);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.DataProtection, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[DataProtectionEntitlements.Key] = new PlistElementString(DataProtectionEntitlements.Value);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.DataProtection, m_EntitlementFilePath);
         }
 
         // Add HealthKit capability to the project.
@@ -357,54 +314,53 @@ namespace UnityEditor.iOS.Xcode
             var capabilityArr = (GetOrCreateInfoDoc().root[HealthInfo.Key] ??
                                 (GetOrCreateInfoDoc().root[HealthInfo.Key] = new PlistElementArray())) as PlistElementArray;
             GetOrCreateStringElementInArray(capabilityArr, HealthInfo.Value);
-            GetOrCreateEntitlementDoc().root[HealthEnt.Key] = new PlistElementBoolean(true);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.HealthKit, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[HealthKitEntitlements.Key] = new PlistElementBoolean(true);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.HealthKit, m_EntitlementFilePath);
         }
 
         // Add Wireless Accessory Configuration capability to the project.
         public void AddWirelessAccessoryConfiguration()
         {
-            GetOrCreateEntitlementDoc().root[WACEnt.Key] = new PlistElementBoolean(true);
-            PBXProject.EnableCapability(_targetGuid, PBXCapabilityType.WirelessAccessoryConfiguration, _entitlementFileName);
+            GetOrCreateEntitlementDoc().root[WirelessAccessoryConfigurationEntitlements.Key] = new PlistElementBoolean(true);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.WirelessAccessoryConfiguration, m_EntitlementFilePath);
         }
 
         private PlistDocument GetOrCreateEntitlementDoc()
         {
-            if (entitlements == null)
+            if (m_Entitlements == null)
             {
-                entitlements = new PlistDocument();
-                string[] entitlementsFiles = Directory.GetFiles(PBXPath.Combine (_buildPath, _targetName), _entitlementFileName);
+                m_Entitlements = new PlistDocument();
+                string[] entitlementsFiles = Directory.GetFiles(m_BuildPath, m_EntitlementFilePath);
                 if (entitlementsFiles.Length > 0)
                 {
-                    entitlements.ReadFromFile(entitlementsFiles[0]);
+                    m_Entitlements.ReadFromFile(entitlementsFiles[0]);
                 }
                 else
                 {
-                    entitlements.Create();
+                    m_Entitlements.Create();
                 }
             }
 
-            return entitlements;
+            return m_Entitlements;
         }
 
         private PlistDocument GetOrCreateInfoDoc()
         {
-            if (infoPlist == null)
+            if (m_InfoPlist == null)
             {
-                infoPlist = new PlistDocument();
-                string[] infoFiles = Directory.GetFiles(_buildPath + "/", "Info.plist");
+                m_InfoPlist = new PlistDocument();
+                string[] infoFiles = Directory.GetFiles(m_BuildPath + "/", "Info.plist");
                 if (infoFiles.Length > 0)
                 {
-                    infoPlist.ReadFromFile(infoFiles[0]);
+                    m_InfoPlist.ReadFromFile(infoFiles[0]);
                 }
                 else
                 {
-                    infoPlist.Create();
+                    m_InfoPlist.Create();
                 }
-
             }
 
-            return infoPlist;
+            return m_InfoPlist;
         }
 
         private PlistElementString GetOrCreateStringElementInArray(PlistElementArray root, string value)
@@ -428,10 +384,13 @@ namespace UnityEditor.iOS.Xcode
             return r;
         }
 
-        private PlistElementDict GetOrCreateUnicDictElementInArray(PlistElementArray root)
+        private PlistElementDict GetOrCreateUniqueDictElementInArray(PlistElementArray root)
         {
             PlistElementDict r;
-            if (root.values.Count == 0) r = root.values[0] as PlistElementDict;
+            if (root.values.Count == 0)
+            {
+                r = root.values[0] as PlistElementDict;
+            }
             else
             {
                 r = new PlistElementDict();
@@ -449,7 +408,7 @@ namespace UnityEditor.iOS.Xcode
         None                           = 0,
         AudioAirplayPiP                = 1<<0,
         LocationUpdates                = 1<<1,
-        VoiceOverIp                    = 1<<2,
+        VoiceOverIP                    = 1<<2,
         NewsstandDownloads             = 1<<3,
         ExternalAccessoryCommunication = 1<<4,
         UsesBluetoothLEAccessory       = 1<<5,
@@ -507,7 +466,7 @@ namespace UnityEditor.iOS.Xcode
         internal static readonly string ModeTrainValue = "MKDirectionsModeTrain";
     }
 
-    internal class BGInfo
+    internal class BackgroundInfo
     {
         internal static readonly string Key = "UIBackgroundModes";
         internal static readonly string ModeAudioValue = "audio";
@@ -527,91 +486,91 @@ namespace UnityEditor.iOS.Xcode
         internal static readonly string Value = "healthkit";
     }
 
-    internal class ICloudEnt
+    internal class ICloudEntitlements
     {
-        internal static readonly string ContIdKey = "com.apple.developer.icloud-container-identifiers";
-        internal static readonly string UbiContIdKey = "com.apple.developer.ubiquity-container-identifiers";
-        internal static readonly string ContIdValue = "iCloud.$(CFBundleIdentifier)";
-        internal static readonly string UbiContIdValue = "iCloud.$(CFBundleIdentifier)";
+        internal static readonly string ContainerIdKey = "com.apple.developer.icloud-container-identifiers";
+        internal static readonly string UbiquityContainerIdKey = "com.apple.developer.ubiquity-container-identifiers";
+        internal static readonly string ContainerIdValue = "iCloud.$(CFBundleIdentifier)";
+        internal static readonly string UbiquityContainerIdValue = "iCloud.$(CFBundleIdentifier)";
         internal static readonly string ServicesKey = "com.apple.developer.icloud-services";
         internal static readonly string ServicesDocValue = "CloudDocuments";
         internal static readonly string ServicesKitValue = "CloudKit";
-        internal static readonly string KvStoreKey = "com.apple.developer.ubiquity-kvstore-identifier";
-        internal static readonly string KvStoreValue = "$(TeamIdentifierPrefix)$(CFBundleIdentifier)";
+        internal static readonly string KeyValueStoreKey = "com.apple.developer.ubiquity-kvstore-identifier";
+        internal static readonly string KeyValueStoreValue = "$(TeamIdentifierPrefix)$(CFBundleIdentifier)";
     }
 
-    internal class PNEnt
+    internal class PushNotificationEntitlements
     {
         internal static readonly string Key = "aps-environment";
-        internal static readonly string DevValue = "development";
-        internal static readonly string ProdValue = "production";
+        internal static readonly string DevelopmentValue = "development";
+        internal static readonly string ProductionValue = "production";
     }
 
-    internal class WalletEnt
+    internal class WalletEntitlements
     {
         internal static readonly string Key = "com.apple.developer.pass-type-identifiers";
         internal static readonly string BaseValue = "$(TeamIdentifierPrefix)";
         internal static readonly string DefaultValue = "*";
     }
 
-    internal class SiriEnt
+    internal class SiriEntitlements
     {
         internal static readonly string Key = "com.apple.developer.siri";
     }
 
-    internal class AppPayEnt
+    internal class ApplePayEntitlements
     {
         internal static readonly string Key = "com.apple.developer.in-app-payments";
     }
 
-    internal class VPNEnt
+    internal class VPNEntitlements
     {
         internal static readonly string Key = "com.apple.developer.networking.vpn.api";
         internal static readonly string Value = "allow-vpn";
     }
 
-    internal class KeyChainEnt
+    internal class KeyChainEntitlements
     {
         internal static readonly string Key = "keychain-access-groups";
         internal static readonly string DefaultValue = "$(AppIdentifierPrefix)$(CFBundleIdentifier)";
     }
 
-    internal class AudioEnt
+    internal class AudioEntitlements
     {
         internal static readonly string Key = "inter-app-audio";
     }
 
-    internal class AssDomEnt
+    internal class AssociatedDomainsEntitlements
     {
         // value is an array of string of domains
         internal static readonly string Key = "com.apple.developer.associated-domains";
     }
 
-    internal class GroupsEnt
+    internal class AppGroupsEntitlements
     {
         // value is an array of string of groups
         internal static readonly string Key = "com.apple.security.application-groups";
     }
 
-    internal class HomeEnt
+    internal class HomeKitEntitlements
     {
         // value is bool true.
         internal static readonly string Key = "com.apple.developer.homekit";
     }
 
-    internal class ProtEnt
+    internal class DataProtectionEntitlements
     {
         internal static readonly string Key = "com.apple.developer.default-data-protection";
         internal static readonly string Value = "NSFileProtectionComplete";
     }
 
-    internal class HealthEnt
+    internal class HealthKitEntitlements
     {
         // value is bool true.
         internal static readonly string Key = "com.apple.developer.healthkit";
     }
 
-    internal class WACEnt
+    internal class WirelessAccessoryConfigurationEntitlements
     {
         // value is bool true.
         internal static readonly string Key = "com.apple.external-accessory.wireless-configuration";

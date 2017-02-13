@@ -303,64 +303,56 @@ namespace UnityEditor.iOS.Xcode
                 RemoveFile(fileGuid);
         }
 
-        // Allow user to enable a Capability
-        public bool EnableCapability(string targetGuid, PBXCapabilityType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = null, bool silentFail = false)
+        // Allow user to add a Capability
+        public bool AddCapability(string targetGuid, PBXCapabilityType capability, string entitlementsFilePath = null, bool addOptionalFramework = false)
         {
-            // Use the default Unity target name if none is provided
-            if (targetName == null)
-                targetName = GetUnityTargetName();
-
             // If the capability requires entitlements then you have to provide the name of it or we don't add the capability.
-            if (capability.RequiresEntitlements && entitlementFileName == "" || entitlementFileName == null)
+            if (capability.requiresEntitlements && entitlementsFilePath == "")
             {
-                if(!silentFail) throw new Exception("Couldn't add the Xcode Capability " + capability.Id + " to the PBXProject file because this capability requires an entitlement file.");
-                return false;
+                throw new Exception("Couldn't add the Xcode Capability " + capability.id + " to the PBXProject file because this capability requires an entitlement file.");
             }
             var p = project.project;
 
             // If an entitlement with a different name was added for another capability
             // we don't add this capacity.
-            if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
+            if (p.entitlementsFile != null && entitlementsFilePath != null && p.entitlementsFile != entitlementsFilePath)
             {
                 if (p.capabilities.Count > 0)
-                    if(!silentFail) throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : " + p.entitlementsFile);
-                    return false;
-            }
+                    throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : " + p.entitlementsFile);
 
-            // Add the capability only if it doesn't already exist.
-            if (p.capabilities.Contains(capability))
-            {
-                if(!silentFail) throw new WarningException("This capability has already been added. Method ignored");
                 return false;
             }
 
-            p.capabilities.Add(capability);
-            p.UpdateCapabilities(targetGuid);
+            // Add the capability only if it doesn't already exist.
+            if (p.capabilities.Contains(new PBXCapabilityType.TargetCapabilityPair(targetGuid, capability)))
+            {
+                throw new WarningException("This capability has already been added. Method ignored");
+            }
+
+            p.capabilities.Add(new PBXCapabilityType.TargetCapabilityPair(targetGuid, capability));
 
             // Add the required framework.
-            if (capability.Framework != "" && !capability.OptionalFramework ||
-                (capability.Framework != "" && capability.OptionalFramework && addOptionalFramework))
+            if (capability.framework != "" && !capability.optionalFramework ||
+               (capability.framework != "" && capability.optionalFramework && addOptionalFramework))
             {
-                AddFrameworkToProject(targetGuid, capability.Framework, false);
+                AddFrameworkToProject(targetGuid, capability.framework, false);
             }
 
             // Finally add the entitlement code signing if it wasn't added before.
-            if (entitlementFileName != "" && p.entitlementsFile == null)
+            if (entitlementsFilePath != null && p.entitlementsFile == null)
             {
-                p.entitlementsFile = entitlementFileName;
-                AddFileImpl(targetName + "/" + entitlementFileName,  entitlementFileName, PBXSourceTree.Source, false);
-                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName.Replace("\\", "/"));
-                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", targetName + "/" + entitlementFileName.Replace("\\", "/"));
+                p.entitlementsFile = entitlementsFilePath;
+                AddFileImpl(entitlementsFilePath,  entitlementsFilePath, PBXSourceTree.Source, false);
+                SetBuildProperty(targetGuid, "CODE_SIGN_ENTITLEMENTS", PBXPath.FixSlashes(entitlementsFilePath));
             }
             return true;
         }
 
         // The Xcode project needs a team set to be able to complete code signing or to add some capabilities.
-        public void SetTeamId(string targetGuid, string teamId, string targetName = "Unity-iPhone")
+        public void SetTeamId(string targetGuid, string teamId)
         {
             SetBuildProperty(targetGuid, "DEVELOPMENT_TEAM", teamId);
-            SetBuildProperty(targetGuid, "DEVELOPMENT_TEAM", teamId);
-            project.project.UpdateTeamId(teamId, targetGuid);
+            project.project.teamIDs.Add(targetGuid, teamId);
         }
 
         // sourceTree must not be PBXSourceTree.Group
@@ -469,6 +461,7 @@ namespace UnityEditor.iOS.Xcode
                 {
                     RemoveGroupChildrenRecursive(gr);
                     GroupsRemove(gr.guid);
+                    continue;
                 }
             }
         }
@@ -786,6 +779,7 @@ namespace UnityEditor.iOS.Xcode
         {
             if (targetGuid == project.project.guid)
                 return project.project.buildConfigList;
+            else
             return nativeTargets[targetGuid].buildConfigList;
         }
 

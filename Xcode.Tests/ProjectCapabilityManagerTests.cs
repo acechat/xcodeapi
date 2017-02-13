@@ -62,17 +62,14 @@ namespace Unity.PureCSharpTests.iOSExtensions
 
         private void SetupTestProject()
         {
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-            if (Directory.Exists(testProjectDir))
-                Directory.Delete(testProjectDir, true);
-
-            Directory.CreateDirectory(testProjectDir);
+            if (File.Exists(Path.Combine(GetTestOutputPath(), "test.entitlements")))
+                File.Delete(Path.Combine(GetTestOutputPath(), "test.entitlements"));
 
             if (File.Exists(Path.Combine(GetTestOutputPath(), "Info.plist")))
                 File.Delete(Path.Combine(GetTestOutputPath(), "Info.plist"));
 
             File.Copy(Path.Combine(GetTestSourcePath(), "base_info.plist"), Path.Combine(GetTestOutputPath(), "Info.plist"));
-            File.Copy(Path.Combine(GetTestSourcePath(), "base.entitlements"), Path.Combine(testProjectDir, "test.entitlements"));
+            File.Copy(Path.Combine(GetTestSourcePath(), "base.entitlements"), Path.Combine(GetTestOutputPath(), "test.entitlements"));
 
             string xcodeProj = Path.Combine(GetTestOutputPath(), "Unity-iPhone.xcodeproj");
             if (Directory.Exists(xcodeProj))
@@ -88,14 +85,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
-            capManager.AddiCloud();
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(true, false, new string[] {});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_icloud.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_icloud.entitlements");
+            TestOutputProject(capManager.project, "add_icloud.pbxproj");
+            TestOutput("test.entitlements", "add_icloud.entitlements");
         }
 
         [Test]
@@ -104,14 +99,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
-            capManager.AddPushNotifications();
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddPushNotifications(true);
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_pushnotification.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_pushnotification.entitlements");
+            TestOutputProject(capManager.project, "add_pushnotification.pbxproj");
+            TestOutput("test.entitlements", "add_pushnotification.entitlements");
         }
 
         [Test]
@@ -120,11 +113,11 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddGameCenter();
             capManager.WriteToFile();
 
-            TestOutputProject(capManager.PBXProject, "add_gamecenter.pbxproj");
+            TestOutputProject(capManager.project, "add_gamecenter.pbxproj");
             TestOutput("Info.plist", "add_gamecenter.plist");
         }
 
@@ -134,14 +127,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddWallet(new string[] {"test1", "test2"});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_wallet.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_wallet.entitlements");
+            TestOutputProject(capManager.project, "add_wallet.pbxproj");
+            TestOutput("test.entitlements", "add_wallet.entitlements");
         }
 
         [Test]
@@ -150,14 +141,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddSiri();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_siri.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_siri.entitlements");
+            TestOutputProject(capManager.project, "add_siri.pbxproj");
+            TestOutput("test.entitlements", "add_siri.entitlements");
         }
 
         [Test]
@@ -166,14 +155,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddApplePay(new string[] {"test1", "test2"});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_applepay.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_applepay.entitlements");
+            TestOutputProject(capManager.project, "add_applepay.pbxproj");
+            TestOutput("test.entitlements", "add_applepay.entitlements");
         }
 
         [Test]
@@ -182,11 +169,11 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddInAppPurchase();
             capManager.WriteToFile();
 
-            TestOutputProject(capManager.PBXProject, "add_iap.pbxproj");
+            TestOutputProject(capManager.project, "add_iap.pbxproj");
         }
 
         [Test]
@@ -195,11 +182,11 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddMaps(MapsOptions.Airplane);
             capManager.WriteToFile();
 
-            TestOutputProject(capManager.PBXProject, "add_maps.pbxproj");
+            TestOutputProject(capManager.project, "add_maps.pbxproj");
             TestOutput("Info.plist", "add_maps.plist");
         }
 
@@ -209,14 +196,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddPersonalVPN();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_personalvpn.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_personalvpn.entitlements");
+            TestOutputProject(capManager.project, "add_personalvpn.pbxproj");
+            TestOutput("test.entitlements", "add_personalvpn.entitlements");
         }
 
         [Test]
@@ -225,11 +210,11 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddBackgroundModes(BackgroundModesOptions.BackgroundFetch);
             capManager.WriteToFile();
 
-            TestOutputProject(capManager.PBXProject, "add_backgroundmodes.pbxproj");
+            TestOutputProject(capManager.project, "add_backgroundmodes.pbxproj");
             TestOutput("Info.plist", "add_backgroundmodes.plist");
         }
 
@@ -239,14 +224,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddKeychainSharing(new string[] {"test1", "test2"});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_keychainsharing.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_keychainsharing.entitlements");
+            TestOutputProject(capManager.project, "add_keychainsharing.pbxproj");
+            TestOutput("test.entitlements", "add_keychainsharing.entitlements");
         }
 
         [Test]
@@ -255,14 +238,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddInterAppAudio();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_interappaudio.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_interappaudio.entitlements");
+            TestOutputProject(capManager.project, "add_interappaudio.pbxproj");
+            TestOutput("test.entitlements", "add_interappaudio.entitlements");
         }
 
         [Test]
@@ -271,14 +252,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddAssociatedDomains(new string[] {"webcredentials:example.com", "webcredentials:example2.com"});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_associateddomains.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_associateddomains.entitlements");
+            TestOutputProject(capManager.project, "add_associateddomains.pbxproj");
+            TestOutput("test.entitlements", "add_associateddomains.entitlements");
         }
 
         [Test]
@@ -287,14 +266,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddAppGroups(new string[] {"test1", "test2"});
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_appgroups.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_appgroups.entitlements");
+            TestOutputProject(capManager.project, "add_appgroups.pbxproj");
+            TestOutput("test.entitlements", "add_appgroups.entitlements");
         }
 
         [Test]
@@ -303,14 +280,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddHomeKit();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_homekit.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_homekit.entitlements");
+            TestOutputProject(capManager.project, "add_homekit.pbxproj");
+            TestOutput("test.entitlements", "add_homekit.entitlements");
         }
 
         [Test]
@@ -319,14 +294,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddDataProtection();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_dataprotection.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_dataprotection.entitlements");
+            TestOutputProject(capManager.project, "add_dataprotection.pbxproj");
+            TestOutput("test.entitlements", "add_dataprotection.entitlements");
         }
 
         [Test]
@@ -335,14 +308,12 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddHealthKit();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
-
-            TestOutputProject(capManager.PBXProject, "add_healthkit.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_healthkit.entitlements");
+            TestOutputProject(capManager.project, "add_healthkit.pbxproj");
+            TestOutput("test.entitlements", "add_healthkit.entitlements");
             TestOutput("Info.plist", "add_healthkit.plist");
         }
 
@@ -352,14 +323,43 @@ namespace Unity.PureCSharpTests.iOSExtensions
             SetupTestProject();
             ResetGuidGenerator();
 
-            var capManager = new ProjectCapabilityManager(GetTestOutputPath(), "test.entitlements");
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
             capManager.AddWirelessAccessoryConfiguration();
             capManager.WriteToFile();
 
-            string testProjectDir = Path.Combine(GetTestOutputPath(), PBXProject.GetUnityTargetName());
+            TestOutputProject(capManager.project, "add_wirelessaccessory.pbxproj");
+            TestOutput("test.entitlements", "add_wirelessaccessory.entitlements");
+        }
 
-            TestOutputProject(capManager.PBXProject, "add_wirelessaccessory.pbxproj");
-            TestOutput(Path.Combine(testProjectDir, "test.entitlements"), "add_wirelessaccessory.entitlements");
+        [Test]
+        public void AddMultipleCapabilitiesWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddGameCenter();
+            capManager.AddInAppPurchase();
+            capManager.AddMaps(MapsOptions.Airplane);
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_multiple.pbxproj");
+        }
+
+        [Test]
+        public void AddMultipleCapabilitiesWithEntitlementWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(true, false, new string[] {});
+            capManager.AddApplePay(new string[] {"test1", "test2"});
+            capManager.AddSiri();
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_multiple_entitlements.pbxproj");
+            TestOutput("test.entitlements", "add_multiple_entitlements.entitlements");
         }
     }
 }

@@ -29,24 +29,36 @@
         private readonly string m_Framework;
         private readonly bool m_OptionalFramework;
 
-        public bool OptionalFramework
+        public bool optionalFramework
         {
             get { return m_OptionalFramework; }
         }
 
-        public string Framework
+        public string framework
         {
             get { return m_Framework; }
         }
 
-        public string Id
+        public string id
         {
             get { return m_ID; }
         }
 
-        public bool RequiresEntitlements
+        public bool requiresEntitlements
         {
             get { return m_RequiresEntitlements; }
+        }
+
+        public struct TargetCapabilityPair
+        {
+            public string targetGuid;
+            public PBXCapabilityType capability;
+
+            public TargetCapabilityPair(string guid, PBXCapabilityType type)
+            {
+                targetGuid = guid;
+                capability = type;
+            }
         }
 
         /// <summary>
@@ -57,12 +69,57 @@
         /// <param name="framework">Specify which framework need to be added to the project for this capability, if "" no framework are added.</param>
         /// <param name="optionalFramework">Some capability (right now only iCloud) adds a framework, not all the time but just when some option are checked
         /// this parameter indicates if one of them is checked.</param>
-        private PBXCapabilityType(string id, bool requiresEntitlements, string framework = "", bool optionalFramework = false)
+        private PBXCapabilityType(string _id, bool _requiresEntitlements, string _framework = "", bool _optionalFramework = false)
         {
-            m_ID = id;
-            m_RequiresEntitlements = requiresEntitlements;
-            m_Framework = framework;
-            m_OptionalFramework = optionalFramework;
+            m_ID = _id;
+            m_RequiresEntitlements = _requiresEntitlements;
+            m_Framework = _framework;
+            m_OptionalFramework = _optionalFramework;
+        }
+
+        public static PBXCapabilityType StringToPBXCapabilityType(string cap)
+        {
+            switch (cap)
+            {
+                case "com.apple.ApplePay":
+                    return ApplePay;
+                case "com.apple.ApplicationGroups.iOS":
+                    return AppGroups;
+                case "com.apple.SafariKeychain":
+                    return AssociatedDomains;
+                case "com.apple.BackgroundModes":
+                    return BackgroundModes;
+                case "com.apple.DataProtection":
+                    return DataProtection;
+                case "com.apple.GameCenter":
+                    return GameCenter;
+                case "com.apple.HealthKit":
+                    return HealthKit;
+                case "com.apple.HomeKit":
+                    return HomeKit;
+                case "com.apple.iCloud":
+                    return iCloud;
+                case "com.apple.InAppPurchase":
+                    return InAppPurchase;
+                case "com.apple.InterAppAudio":
+                    return InterAppAudio;
+                case "com.apple.KeychainSharing":
+                    return KeychainSharing;
+                case "com.apple.Maps.iOS":
+                    return Maps;
+                case "com.apple.VPNLite":
+                    return PersonalVPN;
+                case "com.apple.Push":
+                    return PushNotifications;
+                case "com.apple.Siri":
+                    return Siri;
+                case "com.apple.Wallet":
+                    return Wallet;
+                case "WAC":
+                    return WirelessAccessoryConfiguration;
+                default:
+                    return null;
+            }
         }
     }
 }

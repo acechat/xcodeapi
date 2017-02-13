@@ -14,7 +14,7 @@
 /* Begin PBXFileReference section */
 		08B24F75137BFDFA00FBA309 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Unity-Target-New.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Unity-Target-New.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CCCCCCCC0000000000000001 /* test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.entitlements; sourceTree = SOURCE_ROOT; };
+		CCCCCCCC0000000000000001 /* test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = file; name = test.entitlements; path = Xcode.Tests/PBXProjectTestFiles/test.entitlements; sourceTree = SOURCE_ROOT; };
 		D82DCFBB0E8000A5005D6AD8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Classes/main.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -44,7 +44,7 @@
 				D82DCFB50E8000A5005D6AD8 /* Classes */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				CCCCCCCC0000000000000001 /* test.entitlements */,
+				CCCCCCCC0000000000000002 /* PlatformDependent */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -55,6 +55,46 @@
 				08B24F75137BFDFA00FBA309 /* iAd.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CCCCCCCC0000000000000002 /* PlatformDependent */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCCCCC0000000000000003 /* iPhonePlayer */,
+			);
+			path = PlatformDependent;
+			sourceTree = "<group>";
+		};
+		CCCCCCCC0000000000000003 /* iPhonePlayer */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCCCCC0000000000000004 /* Extensions */,
+			);
+			path = iPhonePlayer;
+			sourceTree = "<group>";
+		};
+		CCCCCCCC0000000000000004 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCCCCC0000000000000005 /* Xcode.Tests */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		CCCCCCCC0000000000000005 /* Xcode.Tests */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCCCCC0000000000000006 /* PBXProjectTestFiles */,
+			);
+			path = Xcode.Tests;
+			sourceTree = "<group>";
+		};
+		CCCCCCCC0000000000000006 /* PBXProjectTestFiles */ = {
+			isa = PBXGroup;
+			children = (
+				CCCCCCCC0000000000000001 /* test.entitlements */,
+			);
+			path = PBXProjectTestFiles;
 			sourceTree = "<group>";
 		};
 		D82DCFB50E8000A5005D6AD8 /* Classes */ = {
@@ -94,7 +134,13 @@
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
 						SystemCapabilities = {
-							com.apple.DataProtection = {
+							com.apple.ApplePay = {
+								enabled = 1;
+							};
+							com.apple.Siri = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -141,7 +187,7 @@
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = test.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Xcode.Tests/PBXProjectTestFiles/test.entitlements;
 			};
 			name = Release;
 		};

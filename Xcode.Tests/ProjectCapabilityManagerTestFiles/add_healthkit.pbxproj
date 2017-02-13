@@ -16,7 +16,7 @@
 		08B24F75137BFDFA00FBA309 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Unity-Target-New.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Unity-Target-New.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCCCCCCC0000000000000001 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
-		CCCCCCCC0000000000000003 /* test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = file; name = test.entitlements; path = "Unity-iPhone/test.entitlements"; sourceTree = SOURCE_ROOT; };
+		CCCCCCCC0000000000000003 /* test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.entitlements; sourceTree = SOURCE_ROOT; };
 		D82DCFBB0E8000A5005D6AD8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Classes/main.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -145,7 +145,7 @@
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "Unity-iPhone/test.entitlements";
+				CODE_SIGN_ENTITLEMENTS = test.entitlements;
 			};
 			name = Release;
 		};

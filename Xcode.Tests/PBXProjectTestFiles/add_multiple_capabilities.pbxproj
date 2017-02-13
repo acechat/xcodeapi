@@ -8,13 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		08B24F76137BFDFA00FBA309 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08B24F75137BFDFA00FBA309 /* iAd.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		CCCCCCCC0000000000000002 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000001 /* GameKit.framework */; };
+		CCCCCCCC0000000000000004 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000003 /* MapKit.framework */; };
 		D82DCFC30E8000A5005D6AD8 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = D82DCFBB0E8000A5005D6AD8 /* main.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		08B24F75137BFDFA00FBA309 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Unity-Target-New.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Unity-Target-New.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CCCCCCCC0000000000000001 /* test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.entitlements; sourceTree = SOURCE_ROOT; };
+		CCCCCCCC0000000000000001 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		CCCCCCCC0000000000000003 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		D82DCFBB0E8000A5005D6AD8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Classes/main.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -24,6 +27,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				08B24F76137BFDFA00FBA309 /* iAd.framework in Frameworks */,
+				CCCCCCCC0000000000000002 /* GameKit.framework in Frameworks */,
+				CCCCCCCC0000000000000004 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,7 +49,6 @@
 				D82DCFB50E8000A5005D6AD8 /* Classes */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				CCCCCCCC0000000000000001 /* test.entitlements */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -53,6 +57,8 @@
 			isa = PBXGroup;
 			children = (
 				08B24F75137BFDFA00FBA309 /* iAd.framework */,
+				CCCCCCCC0000000000000001 /* GameKit.framework */,
+				CCCCCCCC0000000000000003 /* MapKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -94,7 +100,13 @@
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
 						SystemCapabilities = {
-							com.apple.DataProtection = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.Maps.iOS = {
 								enabled = 1;
 							};
 						};
@@ -141,7 +153,6 @@
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = test.entitlements;
 			};
 			name = Release;
 		};
