@@ -285,7 +285,6 @@ namespace UnityEditor.iOS.Xcode
         /// <returns>The compile flags for the specified file.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         /// <param name="fileGuid">The GUID of the file.</param>
-        // FIXME: at the moment returns all flags as the first element of the array
         public List<string> GetCompileFlagsForFile(string targetGuid, string fileGuid)
         {
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
@@ -293,7 +292,7 @@ namespace UnityEditor.iOS.Xcode
                 return null;
             if (buildFile.compileFlags == null)
                 return new List<string>();
-            return new List<string>{buildFile.compileFlags};
+            return new List<string>(buildFile.compileFlags.Split());
         }
 
         /// <summary>
