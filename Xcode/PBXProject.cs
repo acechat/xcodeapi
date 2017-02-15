@@ -874,7 +874,7 @@ namespace UnityEditor.iOS.Xcode
             configs.AddEntry(buildConfigList);
             
             // create build file reference
-            string fullName = name + ext;
+            string fullName = name + "." + FileTypeUtils.TrimExtension(ext);
             var productFileRef = AddFile(fullName, "Products/" + fullName, PBXSourceTree.Build);
             var newTarget = PBXNativeTargetData.Create(name, productFileRef, type, buildConfigList.guid);
             nativeTargets.AddEntry(newTarget);

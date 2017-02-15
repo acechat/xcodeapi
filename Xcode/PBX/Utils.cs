@@ -198,7 +198,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             { "tbd",       new FileTypeDesc("sourcecode.text-based-dylib-definition",  PBXFileType.Framework) }
         };
 
-        private static string TrimExtension(string ext)
+        public static string TrimExtension(string ext)
         {
             return ext.TrimStart('.');
         }
