@@ -431,7 +431,16 @@ namespace UnityEditor.iOS.Xcode
             return FindFileGuidByProjectPath(path) != null;
         }
 
-        public bool HasFramework(string framework)
+        /// <summary>
+        /// Checks whether the given system framework is a dependency of a target.
+        /// The function assumes system frameworks are located in System/Library/Frameworks folder in the SDK source tree.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if the given framework is a dependency of the given target,
+        /// <c>false</c> otherwise.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
+        // FIXME: targetGuid is ignored at the moment
+        public bool ContainsFramework(string targetGuid, string framework)
         {
             return ContainsFileByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
         }
