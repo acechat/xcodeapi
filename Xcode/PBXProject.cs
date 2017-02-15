@@ -433,7 +433,7 @@ namespace UnityEditor.iOS.Xcode
 
         public bool HasFramework(string framework)
         {
-            return ContainsFileByRealPath("System/Library/Frameworks/" + framework);
+            return ContainsFileByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
         }
 
         /// <summary>
