@@ -210,6 +210,78 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void AddingDuplicateFilerefReturnsExisting()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            Assert.AreEqual(fileGuid, proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(fileGuid, proj.AddFile("relative/path2.cc", "Classes/path1.cc", PBXSourceTree.Source));
+        }
+
+        [Test]
+        public void AddingDuplicateFileToBuildIsIgnored()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            proj.AddFileToBuildWithFlags(target, fileGuid, "-Wno-newline");
+            proj.AddFileToBuildWithFlags(target, fileGuid, "-Wnewline"); // this call should be ignored
+
+            Assert.AreEqual(new List<string>{"-Wno-newline"}, proj.GetCompileFlagsForFile(target, fileGuid));
+        }
+
+        [Test]
+        public void SetCompilerFlagsForFileWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            proj.AddFileToBuild(target, fileGuid);
+            proj = Reserialize(proj);
+
+            proj.SetCompileFlagsForFile(target, fileGuid, new List<string>{"-flag1", "flag2"});
+            proj = Reserialize(proj);
+
+            Assert.AreEqual(new List<string>{"-flag1", "flag2"}, proj.GetCompileFlagsForFile(target, fileGuid));
+        }
+
+        [Test]
+        public void SpacesInCompilerFlagsAreStripped()
+        {
+            // NOTE: we may want to change this behavior in the future in order to support spaces in flags
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            proj.AddFileToBuild(target, fileGuid);
+            proj.SetCompileFlagsForFile(target, fileGuid, new List<string>{"  -flag1   ", " flag2  "});
+            proj = Reserialize(proj);
+
+            Assert.AreEqual(new List<string>{"-flag1", "flag2"}, proj.GetCompileFlagsForFile(target, fileGuid));
+        }
+
+        [Test]
+        public void CanRemoveCompilerFlagsForFile()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            proj.AddFileToBuildWithFlags(target, fileGuid, "-Wno-newline");
+            proj.SetCompileFlagsForFile(target, fileGuid, null);
+
+            Assert.AreEqual(0, proj.GetCompileFlagsForFile(target, fileGuid).Count);
+        }
+
+        [Test]
         public void AddSourceFileWithFlagsWorks()
         {
             ResetGuidGenerator();
@@ -219,7 +291,6 @@ namespace Unity.PureCSharpTests.iOSExtensions
             // check if duplicate add is ignored (we don't lose flags)
             proj.AddFileToBuildWithFlags(target, proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source),
                                          "-Wno-newline");
-            proj.AddFileToBuild(target, proj.AddFile("relative/path1.cc", "Classes/path1.cc"));
             
             // check if we can add flags to an existing file and remove them
             proj.AddFileToBuild(target, proj.AddFile("relative/path2.cc", "Classes/path2.cc", PBXSourceTree.Source));
@@ -244,11 +315,70 @@ namespace Unity.PureCSharpTests.iOSExtensions
             // check whether we can add framework reference
             proj.AddFrameworkToProject(target, "Twitter.framework", true);
             proj.AddFrameworkToProject(target, "Foundation.framework", false);
-            // check whether we can remove framework reference
-            proj.AddFrameworkToProject(target, "GameCenter.framework", false);
-            proj = Reserialize(proj);
-            proj.RemoveFrameworkFromProject(target, "GameCenter.framework");
             TestOutput(proj, "add_framework1.pbxproj");
+        }
+
+        [Test]
+        public void RemoveFrameworkWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            proj.AddFrameworkToProject(target, "GameCenter.framework", false);
+            Assert.IsTrue(proj.ContainsFramework(target, "GameCenter.framework"));
+            proj = Reserialize(proj);
+
+            proj.RemoveFrameworkFromProject(target, "GameCenter.framework");
+            Assert.IsFalse(proj.ContainsFramework(target, "GameCenter.framework"));
+        }
+
+        public void FindFileGuidWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+
+            string fileGuid = proj.AddFile("relative/path1.cc", "Classes/path1.cc", PBXSourceTree.Source);
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByProjectPath("Classes/path1.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("relative/path1.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("relative/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("relative/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("/relative/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("relative/path1.cc", PBXSourceTree.Sdk));
+
+            proj.AddFile("absolute/path1.cc", "Classes/path2.cc", PBXSourceTree.Absolute);
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByProjectPath("Classes/path2.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("absolute/path1.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("/absolute/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Sdk));
+
+            proj.AddFile("/absolute2/path2.cc", "Classes/path3.cc", PBXSourceTree.Absolute);
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByProjectPath("Classes/path3.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("/absolute2/path2.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("absolute2/path2.cc"));
+
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("/absolute/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("absolute/path1.cc", PBXSourceTree.Sdk));
+
+            fileGuid = proj.AddFile("sdk/path1.cc", "Classes/path4.cc", PBXSourceTree.Sdk);
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByProjectPath("Classes/path4.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("sdk/path1.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("sdk/path1.cc", PBXSourceTree.Sdk));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("sdk/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("sdk/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("/sdk/path1.cc", PBXSourceTree.Sdk));
+
+            fileGuid = proj.AddFile("dev/path1.cc", "Classes/path5.cc", PBXSourceTree.Developer);
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByProjectPath("Classes/path5.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("dev/path1.cc"));
+            Assert.AreEqual(fileGuid, proj.FindFileGuidByRealPath("dev/path1.cc", PBXSourceTree.Developer));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("dev/path1.cc", PBXSourceTree.Absolute));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("dev/path1.cc", PBXSourceTree.Source));
+            Assert.AreEqual(null, proj.FindFileGuidByRealPath("/dev/path1.cc", PBXSourceTree.Developer));
         }
 
         [Test]
