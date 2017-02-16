@@ -338,14 +338,24 @@ namespace Unity.PureCSharpTests.iOSExtensions
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
-            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string target2Guid = proj.AddTarget("Other", "app", "com.apple.product-type.bundle");
+            proj.AddFrameworksBuildPhase(target2Guid);
 
-            proj.AddFrameworkToProject(target, "GameCenter.framework", false);
-            Assert.IsTrue(proj.ContainsFramework(target, "GameCenter.framework"));
+            proj.AddFrameworkToProject(targetGuid, "GameCenter.framework", false);
+            proj.AddFrameworkToProject(target2Guid, "GameCenter.framework", false);
+            Assert.IsTrue(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
+            Assert.IsTrue(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
             proj = Reserialize(proj);
-
-            proj.RemoveFrameworkFromProject(target, "GameCenter.framework");
-            Assert.IsFalse(proj.ContainsFramework(target, "GameCenter.framework"));
+ 
+            proj.RemoveFrameworkFromProject(targetGuid, "GameCenter.framework");
+            Assert.IsFalse(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
+            Assert.IsTrue(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
+            proj = Reserialize(proj);
+ 
+            proj.RemoveFrameworkFromProject(target2Guid, "GameCenter.framework");
+            Assert.IsFalse(proj.ContainsFramework(targetGuid, "GameCenter.framework"));
+            Assert.IsFalse(proj.ContainsFramework(target2Guid, "GameCenter.framework"));
         }
 
         public void FindFileGuidWorks()

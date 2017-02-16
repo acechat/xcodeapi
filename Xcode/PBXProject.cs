@@ -470,12 +470,13 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
-        // FIXME: targetGuid is ignored at the moment
         public void RemoveFrameworkFromProject(string targetGuid, string framework)
         {
-            string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/" + framework);
-            if (fileGuid != null)
-                RemoveFile(fileGuid);
+            var fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
+            if (fileGuid == null)
+                return;
+
+            BuildFilesRemove(targetGuid, fileGuid);
         }
 
         // Allow user to add a Capability
