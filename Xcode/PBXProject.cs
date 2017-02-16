@@ -439,10 +439,14 @@ namespace UnityEditor.iOS.Xcode
         /// <c>false</c> otherwise.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
-        // FIXME: targetGuid is ignored at the moment
         public bool ContainsFramework(string targetGuid, string framework)
         {
-            return ContainsFileByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
+            var fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/" + framework, PBXSourceTree.Sdk);
+            if (fileGuid == null)
+                return false;
+ 
+            var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
+            return (buildFile != null);
         }
 
         /// <summary>

@@ -319,6 +319,21 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void ContainsFrameworkWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string target2Guid = proj.AddTarget("Other", "app", "com.apple.product-type.bundle");
+
+            proj.AddFrameworkToProject(targetGuid, "Twitter.framework", true);
+            Assert.IsTrue(proj.ContainsFramework(targetGuid, "Twitter.framework"));
+            Assert.IsFalse(proj.ContainsFramework(target2Guid, "Twitter.framework"));
+            Assert.IsFalse(proj.ContainsFramework(targetGuid, "Foundation.framework"));
+            Assert.IsFalse(proj.ContainsFramework(target2Guid, "Foundation.framework"));
+        }
+
+        [Test]
         public void RemoveFrameworkWorks()
         {
             ResetGuidGenerator();
