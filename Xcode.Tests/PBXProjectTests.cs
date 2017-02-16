@@ -44,7 +44,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
             UnityEditor.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
             LinearGuidGenerator.Reset();
         }
-        
+
         private void TestOutput(PBXProject proj, string testFilename)
         {
             string sourceFile = Path.Combine(GetTestSourcePath(), testFilename);
@@ -59,7 +59,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
             other.WriteToFile(outputFile);
             Assert.IsTrue(TestUtils.FileContentsEqual(outputFile, sourceFile));
             if (!DebugEnabled())
-                File.Delete(outputFile);
+                Directory.Delete(GetTestOutputPath(), recursive:true);
         }
         
         private PBXProject ReadPBXProject()
