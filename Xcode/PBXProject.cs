@@ -292,7 +292,7 @@ namespace UnityEditor.iOS.Xcode
                 return null;
             if (buildFile.compileFlags == null)
                 return new List<string>();
-            return new List<string>(buildFile.compileFlags.Split());
+            return new List<string>(buildFile.compileFlags.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries));
         }
 
         /// <summary>
