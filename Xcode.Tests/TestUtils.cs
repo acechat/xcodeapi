@@ -38,7 +38,7 @@ namespace UnityEditor.iOS.Xcode
 
         protected string GetTestOutputPath()
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), m_Output);
+            string path = Path.Combine(m_TestsRoot, m_Output);
             Directory.CreateDirectory(path);
             return path;
         }
