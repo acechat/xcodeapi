@@ -264,7 +264,16 @@ namespace UnityEditor.iOS.Xcode.Extensions
             return newTargetGuid;
         }
 
-        // Returns the guid of the new target
+        /// <summary>
+        /// Adds the watch app.
+        /// </summary>
+        /// <returns>The GUID of the new target.</returns>
+        /// <param name="proj">A project passed as this argument.</param>
+        /// <param name="mainTargetGuid">The GUID of the main target to link the watch app to.</param>
+        /// <param name="watchExtensionTargetGuid">Watch extension target GUID.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="bundleId">The bundle ID of the watch app.</param>
+        /// <param name="infoPlistPath">Path to the watch extension Info.plist document.</param>
         public static string AddWatchApp(this PBXProject proj, string mainTargetGuid, string watchExtensionTargetGuid, 
                                          string name, string bundleId, string infoPlistPath)
         {
@@ -296,6 +305,17 @@ namespace UnityEditor.iOS.Xcode.Extensions
             return newTargetGuid;
         }
 
+        /// <summary>
+        /// Creates a watch extension.
+        /// </summary>
+        /// <returns>The GUID of the new target.</returns>
+        /// <param name="proj">A project passed as this argument.</param>
+        /// <param name="mainTarget">The GUID of the main target to link the watch extension to.</param>
+        /// <param name="name">The name of the watch extension.</param>
+        /// <param name="bundleId">The bundle ID of the watch extension. This bundle ID must include the 
+        /// bundle ID that is later used for watch app as a prefix. That is, the structure of the ID 
+        /// is as follows: watchAppBundleId + ".a_subdomain".</param>
+        /// <param name="infoPlistPath">Path to the watch extension Info.plist document.</param>
         public static string AddWatchExtension(this PBXProject proj, string mainTarget, 
                                                string name, string bundleId, string infoPlistPath)
         {
