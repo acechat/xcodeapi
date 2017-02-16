@@ -718,7 +718,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="path">The path to the external Xcode project (the .xcodeproj file).</param>
         /// <param name="projectPath">The project path to the new project.</param>
         /// <param name="sourceTree">The source tree the path is relative to. The [[PBXSourceTree.Group]] tree is not supported.</param>
-        public void AddExternalProjectDependency(string path, string projectPath, PBXSourceTree sourceTree)
+        internal void AddExternalProjectDependency(string path, string projectPath, PBXSourceTree sourceTree)
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
@@ -746,7 +746,7 @@ namespace UnityEditor.iOS.Xcode
             TODO: what. is remoteInfo entry in PBXContainerItemProxy? Is in referenced project name or
             referenced library name without extension?
         */
-        public void AddExternalLibraryDependency(string targetGuid, string filename, string remoteFileGuid, string projectPath,
+        internal void AddExternalLibraryDependency(string targetGuid, string filename, string remoteFileGuid, string projectPath,
                                                  string remoteInfo)
         {
             PBXNativeTargetData target = nativeTargets[targetGuid];
@@ -839,7 +839,7 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <param name="targetGuid">The GUID of the target that is depending on the dependency.</param>
         /// <param name="targetDependencyGuid">The GUID of the dependency target</param>
-        public void AddTargetDependency(string targetGuid, string targetDependencyGuid)
+        internal void AddTargetDependency(string targetGuid, string targetDependencyGuid)
         {
             string dependencyName = nativeTargets[targetDependencyGuid].name;
             var containerProxy = PBXContainerItemProxyData.Create(project.project.guid, "1", targetDependencyGuid, dependencyName);
