@@ -114,7 +114,7 @@ namespace UnityEditor.iOS.Xcode
         /// target GUIDs as parameters.
         /// </summary>
         /// <returns>The GUID of the project.</returns>
-        internal string ProjectGuid()
+        public string ProjectGuid()
         {
             return project.project.guid;
         }

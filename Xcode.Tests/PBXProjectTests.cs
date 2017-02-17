@@ -495,7 +495,15 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
-        public void GetBuildConfigNamesWorks()
+        public void ProjectGuidWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            Assert.AreEqual("29B97313FDCFA39411CA2CEA", proj.ProjectGuid());
+        }
+
+        [Test]
+        public void BuildConfigNamesWorks()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -515,6 +523,16 @@ namespace Unity.PureCSharpTests.iOSExtensions
             Assert.AreEqual("1D6058950D05DD3E006BFB54", proj.BuildConfigByName(targetGuid, "Release"));
             Assert.AreEqual("CCCCCCCC0000000000000001", proj.BuildConfigByName(proj.ProjectGuid(), "Debug"));
             Assert.AreEqual("CCCCCCCC0000000000000002", proj.BuildConfigByName(targetGuid, "Debug"));
+        }
+
+        [Test]
+        public void AddBuildConfigThrowsExceptionOnDuplicate()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+
+            proj.AddBuildConfig("Existing");
+            Assert.Throws<System.Exception>(() => proj.AddBuildConfig("Existing"));
         }
 
         [Test]
