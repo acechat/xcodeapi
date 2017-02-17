@@ -942,6 +942,15 @@ namespace UnityEditor.iOS.Xcode
             return buildConfig.guid;
         }
 
+        private void RemoveBuildConfigForTarget(string targetGuid, string name)
+        {
+            var buildConfigGuid = BuildConfigByName(targetGuid, name);
+            if (buildConfigGuid == null)
+                return;
+            buildConfigs.RemoveEntry(buildConfigGuid);
+            buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs.RemoveGUID(buildConfigGuid);
+        }
+
         /// <summary>
         /// Returns the GUID of build configuration with the given name for the specific target.
         /// Null is returned if such configuration does not exist.
@@ -991,6 +1000,19 @@ namespace UnityEditor.iOS.Xcode
         {
             foreach (var targetGuid in GetAllTargetGuids())
                 AddBuildConfigForTarget(targetGuid, name);
+        }
+
+        /// <summary>
+        /// Removes all build configurations with the given name from all targets in the project.
+        /// The number and names of the build configurations is a project-wide setting. Each target has the
+        /// same number of build configurations and the names of these build configurations is the same.
+        /// The function does nothing if the build configuration with the specified name does not exist.
+        /// </summary>
+        /// <param name="name">The name of the build configuration.</param>
+        public void RemoveBuildConfig(string name)
+        {
+            foreach (var targetGuid in GetAllTargetGuids())
+                RemoveBuildConfigForTarget(targetGuid, name);   
         }
 
         /// <summary>

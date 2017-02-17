@@ -534,6 +534,26 @@ namespace Unity.PureCSharpTests.iOSExtensions
             proj.AddBuildConfig("Existing");
             Assert.Throws<System.Exception>(() => proj.AddBuildConfig("Existing"));
         }
+ 
+        [Test]
+        public void RemoveBuildConfigWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            var targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            proj.AddBuildConfig("Debug");
+            proj = Reserialize(proj);
+
+            proj.RemoveBuildConfig("Debug");
+            proj.RemoveBuildConfig("NotExisting"); // should be ignored
+
+            Assert.AreEqual(new List<string>{"Release"}, proj.BuildConfigNames());
+            Assert.AreEqual("C01FCF5008A954540054247B", proj.BuildConfigByName(proj.ProjectGuid(), "Release"));
+            Assert.AreEqual("1D6058950D05DD3E006BFB54", proj.BuildConfigByName(targetGuid, "Release"));
+            Assert.AreEqual(null, proj.BuildConfigByName(proj.ProjectGuid(), "Debug"));
+            Assert.AreEqual(null, proj.BuildConfigByName(targetGuid, "Debug"));
+        }
 
         [Test]
         public void AddTargetWorks()
