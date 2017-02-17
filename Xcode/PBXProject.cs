@@ -950,6 +950,24 @@ namespace UnityEditor.iOS.Xcode
         }
 
         /// <summary>
+        /// Returns the names of the build configurations available in the project.
+        /// The number and names of the build configurations is a project-wide setting. Each target has the
+        /// same number of build configurations and the names of these build configurations is the same.
+        /// In other words, [[BuildConfigByName()]] will succeed for all targets in the project and all
+        /// build configuration names returned by this function.
+        /// </summary>
+        /// <returns>An array of build config names.</returns>
+        public IEnumerable<string> BuildConfigNames()
+        {
+            var names = new List<string>();
+            // We use the project target to fetch the build configs
+            foreach (var guid in buildConfigLists[project.project.buildConfigList].buildConfigs)
+                names.Add(buildConfigs[guid].name);
+
+            return names;
+        }
+
+        /// <summary>
         /// Creates a new sources build phase for given target.
         /// The new phase is placed at the end of the list of build phases configured for the target.
         /// </summary>

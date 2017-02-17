@@ -495,6 +495,14 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void GetBuildConfigNamesWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            Assert.AreEqual(new List<string>{"Release"}, proj.BuildConfigNames());
+        }
+
+        [Test]
         public void AddTargetWorks()
         {
             ResetGuidGenerator();
