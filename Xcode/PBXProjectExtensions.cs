@@ -26,76 +26,22 @@ namespace UnityEditor.iOS.Xcode.Extensions
 
         internal static FlagList appExtensionReleaseBuildFlags = new FlagList
         {
-            { "ALWAYS_SEARCH_USER_PATHS", "NO" },
-            { "CLANG_CXX_LANGUAGE_STANDARD", "gnu++0x" },
-            { "CLANG_CXX_LIBRARY", "libc++" },
-            { "CLANG_ENABLE_MODULES", "YES" },
-            { "CLANG_ENABLE_OBJC_ARC", "YES" },
-            { "CLANG_WARN_BOOL_CONVERSION", "YES" },
-            { "CLANG_WARN_CONSTANT_CONVERSION", "YES" },
-            { "CLANG_WARN_DIRECT_OBJC_ISA_USAGE", "YES_ERROR" },
-            { "CLANG_WARN_EMPTY_BODY", "YES" },
-            { "CLANG_WARN_ENUM_CONVERSION", "YES" },
-            { "CLANG_WARN_INT_CONVERSION", "YES" },
-            { "CLANG_WARN_OBJC_ROOT_CLASS", "YES_ERROR" },
-            { "CLANG_WARN_UNREACHABLE_CODE", "YES" },
-            { "CLANG_WARN__DUPLICATE_METHOD_MATCH", "YES" },
-            { "COPY_PHASE_STRIP", "YES" },
-            { "ENABLE_NS_ASSERTIONS", "NO" },
-            { "ENABLE_STRICT_OBJC_MSGSEND", "YES" },
-            { "GCC_C_LANGUAGE_STANDARD", "gnu99" },
-            { "GCC_WARN_64_TO_32_BIT_CONVERSION", "YES" },
-            { "GCC_WARN_ABOUT_RETURN_TYPE", "YES_ERROR" },
-            { "GCC_WARN_UNDECLARED_SELECTOR", "YES" },
-            { "GCC_WARN_UNINITIALIZED_AUTOS", "YES_AGGRESSIVE" },
-            { "GCC_WARN_UNUSED_FUNCTION", "YES" },
-            //{ "INFOPLIST_FILE", <path/to/info.plist> },
-            { "IPHONEOS_DEPLOYMENT_TARGET", "8.0" },
+            // { "INFOPLIST_FILE", <path/to/info.plist> },
             { "LD_RUNPATH_SEARCH_PATHS", "$(inherited)" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks" },
-            { "MTL_ENABLE_DEBUG_INFO", "NO" },
+            // { "PRODUCT_BUNDLE_IDENTIFIER", "<bundle id>" },
             { "PRODUCT_NAME", "$(TARGET_NAME)" },
             { "SKIP_INSTALL", "YES" },
-            { "VALIDATE_PRODUCT", "YES" }
         };
 
         internal static FlagList appExtensionDebugBuildFlags = new FlagList
         {
-            { "ALWAYS_SEARCH_USER_PATHS", "NO" },
-            { "CLANG_CXX_LANGUAGE_STANDARD", "gnu++0x" },
-            { "CLANG_CXX_LIBRARY", "libc++" },
-            { "CLANG_ENABLE_MODULES", "YES" },
-            { "CLANG_ENABLE_OBJC_ARC", "YES" },
-            { "CLANG_WARN_BOOL_CONVERSION", "YES" },
-            { "CLANG_WARN_CONSTANT_CONVERSION", "YES" },
-            { "CLANG_WARN_DIRECT_OBJC_ISA_USAGE", "YES_ERROR" },
-            { "CLANG_WARN_EMPTY_BODY", "YES" },
-            { "CLANG_WARN_ENUM_CONVERSION", "YES" },
-            { "CLANG_WARN_INT_CONVERSION", "YES" },
-            { "CLANG_WARN_OBJC_ROOT_CLASS", "YES_ERROR" },
-            { "CLANG_WARN_UNREACHABLE_CODE", "YES" },
-            { "CLANG_WARN__DUPLICATE_METHOD_MATCH", "YES" },
-            { "COPY_PHASE_STRIP", "NO" },
-            { "ENABLE_STRICT_OBJC_MSGSEND", "YES" },
-            { "GCC_C_LANGUAGE_STANDARD", "gnu99" },
-            { "GCC_DYNAMIC_NO_PIC", "NO" },
-            { "GCC_OPTIMIZATION_LEVEL", "0" },
-            { "GCC_PREPROCESSOR_DEFINITIONS", "DEBUG=1" },
-            { "GCC_PREPROCESSOR_DEFINITIONS", "$(inherited)" },
-            { "GCC_SYMBOLS_PRIVATE_EXTERN", "NO" },
-            { "GCC_WARN_64_TO_32_BIT_CONVERSION", "YES" },
-            { "GCC_WARN_ABOUT_RETURN_TYPE", "YES_ERROR" },
-            { "GCC_WARN_UNDECLARED_SELECTOR", "YES" },
-            { "GCC_WARN_UNINITIALIZED_AUTOS", "YES_AGGRESSIVE" },
-            { "GCC_WARN_UNUSED_FUNCTION", "YES" },
             // { "INFOPLIST_FILE", <path/to/info.plist> },
-            { "IPHONEOS_DEPLOYMENT_TARGET", "8.0" },
             { "LD_RUNPATH_SEARCH_PATHS", "$(inherited)" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks" },
             { "LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks" },
-            { "MTL_ENABLE_DEBUG_INFO", "YES" },
-            { "ONLY_ACTIVE_ARCH", "YES" },
+            // { "PRODUCT_BUNDLE_IDENTIFIER", "<bundle id>" },
             { "PRODUCT_NAME", "$(TARGET_NAME)" },
             { "SKIP_INSTALL", "YES" },
         };
@@ -234,12 +180,18 @@ namespace UnityEditor.iOS.Xcode.Extensions
             SetBuildFlagsFromDict(proj, configGuid, watchAppDebugBuildFlags);
         }
 
-        /* Creates a new app extension. 
-
-            Returns the guid of the new target
-        */
-        internal static string AddAppExtension(this PBXProject proj, string mainTarget, 
-                                               string name, string infoPlistPath)
+        /// <summary>
+        /// Creates an app extension.
+        /// </summary>
+        /// <returns>The GUID of the new target.</returns>
+        /// <param name="proj">A project passed as this argument.</param>
+        /// <param name="mainTargetGuid">The GUID of the main target to link the app to.</param>
+        /// <param name="name">The name of the app extension.</param>
+        /// <param name="bundleId">The bundle ID of the app extension. The bundle ID must be
+        /// prefixed with the parent app bundle ID.</param>
+        /// <param name="infoPlistPath">Path to the app extension Info.plist document.</param>
+        public static string AddAppExtension(this PBXProject proj, string mainTargetGuid, 
+                                             string name, string bundleId, string infoPlistPath)
         {
             string ext = ".appex";
             var newTargetGuid = proj.AddTarget(name, ext, "com.apple.product-type.app-extension");
@@ -252,29 +204,30 @@ namespace UnityEditor.iOS.Xcode.Extensions
                 else
                     SetDefaultAppExtensionReleaseBuildFlags(proj, configGuid);
                 proj.SetBuildPropertyForConfig(configGuid, "INFOPLIST_FILE", infoPlistPath);
+                proj.SetBuildPropertyForConfig(configGuid, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
             }
 
             proj.AddSourcesBuildPhase(newTargetGuid);
             proj.AddResourcesBuildPhase(newTargetGuid);
             proj.AddFrameworksBuildPhase(newTargetGuid);
-            string copyFilesPhaseGuid = proj.AddCopyFilesBuildPhase(mainTarget, "Embed App Extensions", "", "13");
-            proj.AddFileToBuildSection(mainTarget, copyFilesPhaseGuid, proj.GetTargetProductFileRef(newTargetGuid));
+            string copyFilesPhaseGuid = proj.AddCopyFilesBuildPhase(mainTargetGuid, "Embed App Extensions", "", "13");
+            proj.AddFileToBuildSection(mainTargetGuid, copyFilesPhaseGuid, proj.GetTargetProductFileRef(newTargetGuid));
 
-            proj.AddTargetDependency(mainTarget, newTargetGuid);
+            proj.AddTargetDependency(mainTargetGuid, newTargetGuid);
 
             return newTargetGuid;
         }
 
         /// <summary>
-        /// Adds the watch app.
+        /// Creates a watch application.
         /// </summary>
         /// <returns>The GUID of the new target.</returns>
         /// <param name="proj">A project passed as this argument.</param>
         /// <param name="mainTargetGuid">The GUID of the main target to link the watch app to.</param>
-        /// <param name="watchExtensionTargetGuid">Watch extension target GUID.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="watchExtensionTargetGuid">The GUID of watch extension as returned by [[AddWatchExtension()]].</param>
+        /// <param name="name">The name of the watch app. It must the same as the name of the watch extension.</param>
         /// <param name="bundleId">The bundle ID of the watch app.</param>
-        /// <param name="infoPlistPath">Path to the watch extension Info.plist document.</param>
+        /// <param name="infoPlistPath">Path to the watch app Info.plist document.</param>
         public static string AddWatchApp(this PBXProject proj, string mainTargetGuid, string watchExtensionTargetGuid, 
                                          string name, string bundleId, string infoPlistPath)
         {
@@ -314,9 +267,8 @@ namespace UnityEditor.iOS.Xcode.Extensions
         /// <param name="proj">A project passed as this argument.</param>
         /// <param name="mainTarget">The GUID of the main target to link the watch extension to.</param>
         /// <param name="name">The name of the watch extension.</param>
-        /// <param name="bundleId">The bundle ID of the watch extension. This bundle ID must include the 
-        /// bundle ID that is later used for watch app as a prefix. That is, the structure of the ID 
-        /// is as follows: watchAppBundleId + ".a_subdomain".</param>
+        /// <param name="bundleId">The bundle ID of the watch extension. The bundle ID must be
+        /// prefixed with the parent watch app bundle ID.</param>
         /// <param name="infoPlistPath">Path to the watch extension Info.plist document.</param>
         public static string AddWatchExtension(this PBXProject proj, string mainTarget, 
                                                string name, string bundleId, string infoPlistPath)

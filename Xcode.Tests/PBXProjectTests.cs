@@ -598,6 +598,17 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void AddAppExtensionWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            proj.AddBuildConfig("Debug");
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            proj.AddAppExtension(target, "App Extension", "com.company.product.appextension", "App Extension/Info.plist");
+            TestOutput(proj, "add_app_extension.pbxproj");
+        }
+
+        [Test]
         public void AddWatchExtensionWorks()
         {
             ResetGuidGenerator();
