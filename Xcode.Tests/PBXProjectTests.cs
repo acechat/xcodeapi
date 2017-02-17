@@ -567,6 +567,24 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void AddTargetAddsRequiredBuildConfigs()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            proj.AddBuildConfig("Debug");
+            string targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string newTargetGuid = proj.AddTarget("TestTarget", ".dylib", "test.type");
+
+            Assert.AreEqual("C01FCF5008A954540054247B", proj.BuildConfigByName(proj.ProjectGuid(), "Release"));
+            Assert.AreEqual("1D6058950D05DD3E006BFB54", proj.BuildConfigByName(targetGuid, "Release"));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.BuildConfigByName(newTargetGuid, "Release"));
+
+            Assert.AreEqual("CCCCCCCC0000000000000001", proj.BuildConfigByName(proj.ProjectGuid(), "Debug"));
+            Assert.AreEqual("CCCCCCCC0000000000000002", proj.BuildConfigByName(targetGuid, "Debug"));
+            Assert.AreEqual("CCCCCCCC0000000000000007", proj.BuildConfigByName(newTargetGuid, "Debug"));
+        }
+
+        [Test]
         public void AddBuildPhasesWorks()
         {
             ResetGuidGenerator();
