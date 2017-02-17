@@ -503,6 +503,21 @@ namespace Unity.PureCSharpTests.iOSExtensions
         }
 
         [Test]
+        public void AddBuildConfigWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            var targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            proj.AddBuildConfig("Debug");
+            Assert.AreEqual(new List<string>{"Release", "Debug"}, proj.BuildConfigNames());
+            Assert.AreEqual("C01FCF5008A954540054247B", proj.BuildConfigByName(proj.ProjectGuid(), "Release"));
+            Assert.AreEqual("1D6058950D05DD3E006BFB54", proj.BuildConfigByName(targetGuid, "Release"));
+            Assert.AreEqual("CCCCCCCC0000000000000001", proj.BuildConfigByName(proj.ProjectGuid(), "Debug"));
+            Assert.AreEqual("CCCCCCCC0000000000000002", proj.BuildConfigByName(targetGuid, "Debug"));
+        }
+
+        [Test]
         public void AddTargetWorks()
         {
             ResetGuidGenerator();

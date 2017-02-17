@@ -888,6 +888,16 @@ namespace UnityEditor.iOS.Xcode
             return newTarget.guid;
         }
 
+        private IEnumerable<string> GetAllTargetGuids()
+        {
+            var targets = new List<string>();
+
+            targets.Add(project.project.guid);
+            targets.AddRange(nativeTargets.GetGuids());
+
+            return targets;
+        }
+
         /// <summary>
         /// Returns the file reference of the artifact created by building target.
         /// </summary>
@@ -917,6 +927,7 @@ namespace UnityEditor.iOS.Xcode
 
         // Returns the GUID of the new configuration
         // TODO: make private
+        // targetGuid can be either native target or the project target.
         internal string AddBuildConfigForTarget(string targetGuid, string name)
         {
             if (BuildConfigByName(targetGuid, name) != null)
@@ -965,6 +976,21 @@ namespace UnityEditor.iOS.Xcode
                 names.Add(buildConfigs[guid].name);
 
             return names;
+        }
+
+        /// <summary>
+        /// Creates a new set of build configurations for all targets in the project.
+        /// The number and names of the build configurations is a project-wide setting. Each target has the
+        /// same number of build configurations and the names of these build configurations is the same.
+        /// The created configurations are initially empty. Care must be taken to fill them with reasonable 
+        /// defaults.
+        /// The function throws an exception if a build configuration with the given name already exists.
+        /// </summary>
+        /// <param name="name">The name of the build configuration.</param>
+        public void AddBuildConfig(string name)
+        {
+            foreach (var targetGuid in GetAllTargetGuids())
+                AddBuildConfigForTarget(targetGuid, name);
         }
 
         /// <summary>
