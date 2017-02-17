@@ -47,7 +47,7 @@ namespace UnityEditor.iOS.Xcode
         public PBXTargetDependencySection targetDependencies = null;
         public PBXVariantGroupSection variantGroups = null;
         public XCBuildConfigurationSection buildConfigs = null;
-        public XCConfigurationListSection configs = null;
+        public XCConfigurationListSection buildConfigLists = null;
         public PBXProjectSection project = null;
 
         // FIXME: create a separate PBXObject tree to represent these relationships
@@ -332,7 +332,7 @@ namespace UnityEditor.iOS.Xcode
             targetDependencies = new PBXTargetDependencySection("PBXTargetDependency");
             variantGroups = new PBXVariantGroupSection("PBXVariantGroup");
             buildConfigs = new XCBuildConfigurationSection("XCBuildConfiguration");
-            configs = new XCConfigurationListSection("XCConfigurationList");
+            buildConfigLists = new XCConfigurationListSection("XCConfigurationList");
             project = new PBXProjectSection();
             m_UnknownSections = new Dictionary<string, UnknownSection>();
 
@@ -352,7 +352,7 @@ namespace UnityEditor.iOS.Xcode
                 { "PBXTargetDependency", targetDependencies },
                 { "PBXVariantGroup", variantGroups },
                 { "XCBuildConfiguration", buildConfigs },
-                { "XCConfigurationList", configs },
+                { "XCConfigurationList", buildConfigLists },
 
                 { "PBXProject", project },
             };
@@ -685,8 +685,8 @@ namespace UnityEditor.iOS.Xcode
             // XCBuildConfiguration / buildConfigs not cleaned
 
             // XCConfigurationList
-            changed |= RemoveObjectsFromSection(configs, allGuids, o => o.buildConfigs == null);
-            foreach (var o in configs.GetObjects())
+            changed |= RemoveObjectsFromSection(buildConfigLists, allGuids, o => o.buildConfigs == null);
+            foreach (var o in buildConfigLists.GetObjects())
                 RemoveMissingGuidsFromGuidList(o.buildConfigs, allGuids);
 
             // PBXProject project not cleaned

@@ -52,7 +52,7 @@ namespace UnityEditor.iOS.Xcode
         internal PBXTargetDependencySection targetDependencies { get { return m_Data.targetDependencies; } }
         internal PBXVariantGroupSection variantGroups        { get { return m_Data.variantGroups; } }
         internal XCBuildConfigurationSection buildConfigs    { get { return m_Data.buildConfigs; } }
-        internal XCConfigurationListSection configs          { get { return m_Data.configs; } }
+        internal XCConfigurationListSection buildConfigLists { get { return m_Data.buildConfigLists; } }
         internal PBXProjectSection project                   { get { return m_Data.project; } }
 
         internal PBXBuildFileData BuildFilesGet(string guid) { return m_Data.BuildFilesGet(guid); }
@@ -876,7 +876,7 @@ namespace UnityEditor.iOS.Xcode
         public string AddTarget(string name, string ext, string type)
         {
             var buildConfigList = XCConfigurationListData.Create();
-            configs.AddEntry(buildConfigList);
+            buildConfigLists.AddEntry(buildConfigList);
             
             // create build file reference
             string fullName = name + "." + FileTypeUtils.TrimExtension(ext);
@@ -927,7 +927,7 @@ namespace UnityEditor.iOS.Xcode
             var buildConfig = XCBuildConfigurationData.Create(name);
             buildConfigs.AddEntry(buildConfig);
 
-            configs[GetConfigListForTarget(targetGuid)].buildConfigs.AddGUID(buildConfig.guid);
+            buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs.AddGUID(buildConfig.guid);
             return buildConfig.guid;
         }
 
@@ -940,7 +940,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="name">The name of the build configuration.</param>
         public string BuildConfigByName(string targetGuid, string name)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
             {
                 var buildConfig = buildConfigs[guid];
                 if (buildConfig != null && buildConfig.name == name)
@@ -1035,7 +1035,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="value">The value of the build property.</param>
         public void AddBuildProperty(string targetGuid, string name, string value)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 AddBuildPropertyForConfig(guid, name, value);
         }
 
@@ -1090,7 +1090,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="value">The value of the build property.</param>
         public void SetBuildProperty(string targetGuid, string name, string value)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 SetBuildPropertyForConfig(guid, name, value);
         }
 
@@ -1119,7 +1119,7 @@ namespace UnityEditor.iOS.Xcode
 
         internal void RemoveBuildProperty(string targetGuid, string name)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 RemoveBuildPropertyForConfig(guid, name);
         }
         internal void RemoveBuildProperty(IEnumerable<string> targetGuids, string name)
@@ -1139,7 +1139,7 @@ namespace UnityEditor.iOS.Xcode
 
         internal void RemoveBuildPropertyValueList(string targetGuid, string name, IEnumerable<string> valueList)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 RemoveBuildPropertyValueListForConfig(guid, name, valueList);
         }
         internal void RemoveBuildPropertyValueList(IEnumerable<string> targetGuids, string name, IEnumerable<string> valueList)
@@ -1162,7 +1162,7 @@ namespace UnityEditor.iOS.Xcode
         public void UpdateBuildProperty(string targetGuid, string name, 
                                         IEnumerable<string> addValues, IEnumerable<string> removeValues)
         {
-            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
+            foreach (string guid in buildConfigLists[GetConfigListForTarget(targetGuid)].buildConfigs)
                 UpdateBuildPropertyForConfig(guid, name, addValues, removeValues);
         }
         public void UpdateBuildProperty(IEnumerable<string> targetGuids, string name, 
