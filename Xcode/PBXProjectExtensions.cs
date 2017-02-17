@@ -244,14 +244,15 @@ namespace UnityEditor.iOS.Xcode.Extensions
             string ext = ".appex";
             var newTargetGuid = proj.AddTarget(name, ext, "com.apple.product-type.app-extension");
 
-            var debugConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Debug");
-            var releaseConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Release");
-
-            SetDefaultAppExtensionDebugBuildFlags(proj, debugConfigGuid);
-            SetDefaultAppExtensionReleaseBuildFlags(proj, releaseConfigGuid);
-
-            var configs = new string[] { debugConfigGuid, releaseConfigGuid };
-            proj.SetBuildPropertyForConfig(configs, "INFOPLIST_FILE", infoPlistPath);
+            foreach (var configName in proj.BuildConfigNames())
+            {
+                var configGuid = proj.BuildConfigByName(newTargetGuid, configName);
+                if (configName.Contains("Debug"))
+                    SetDefaultAppExtensionDebugBuildFlags(proj, configGuid);
+                else
+                    SetDefaultAppExtensionReleaseBuildFlags(proj, configGuid);
+                proj.SetBuildPropertyForConfig(configGuid, "INFOPLIST_FILE", infoPlistPath);
+            }
 
             proj.AddSourcesBuildPhase(newTargetGuid);
             proj.AddResourcesBuildPhase(newTargetGuid);
@@ -279,18 +280,19 @@ namespace UnityEditor.iOS.Xcode.Extensions
         {
             var newTargetGuid = proj.AddTarget(name, ".app", "com.apple.product-type.application.watchapp2");
 
-            var debugConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Debug");
-            var releaseConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Release");
-
-            SetDefaultWatchAppDebugBuildFlags(proj, debugConfigGuid);
-            SetDefaultWatchAppReleaseBuildFlags(proj, releaseConfigGuid);
-
             var isbcModuleName = proj.nativeTargets[watchExtensionTargetGuid].name.Replace(" ", "_");
 
-            var configs = new string[] { debugConfigGuid, releaseConfigGuid };
-            proj.SetBuildPropertyForConfig(configs, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
-            proj.SetBuildPropertyForConfig(configs, "INFOPLIST_FILE", infoPlistPath);
-            proj.SetBuildPropertyForConfig(configs, "IBSC_MODULE", isbcModuleName);
+            foreach (var configName in proj.BuildConfigNames())
+            {
+                var configGuid = proj.BuildConfigByName(newTargetGuid, configName);
+                if (configName.Contains("Debug"))
+                    SetDefaultWatchAppDebugBuildFlags(proj, configGuid);
+                else
+                    SetDefaultWatchAppReleaseBuildFlags(proj, configGuid);
+                proj.SetBuildPropertyForConfig(configGuid, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
+                proj.SetBuildPropertyForConfig(configGuid, "INFOPLIST_FILE", infoPlistPath);
+                proj.SetBuildPropertyForConfig(configGuid, "IBSC_MODULE", isbcModuleName);
+            }
 
             proj.AddResourcesBuildPhase(newTargetGuid);
             string copyFilesGuid = proj.AddCopyFilesBuildPhase(newTargetGuid, "Embed App Extensions", "", "13");
@@ -321,15 +323,16 @@ namespace UnityEditor.iOS.Xcode.Extensions
         {
             var newTargetGuid = proj.AddTarget(name, ".appex", "com.apple.product-type.watchkit2-extension");
 
-            var debugConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Debug");
-            var releaseConfigGuid = proj.AddBuildConfigForTarget(newTargetGuid, "Release");
-
-            SetDefaultWatchExtensionDebugBuildFlags(proj, debugConfigGuid);
-            SetDefaultWatchExtensionReleaseBuildFlags(proj, releaseConfigGuid);
-
-            var configs = new string[] { debugConfigGuid, releaseConfigGuid };
-            proj.SetBuildPropertyForConfig(configs, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
-            proj.SetBuildPropertyForConfig(configs, "INFOPLIST_FILE", infoPlistPath);
+            foreach (var configName in proj.BuildConfigNames())
+            {
+                var configGuid = proj.BuildConfigByName(newTargetGuid, configName);
+                if (configName.Contains("Debug"))
+                    SetDefaultWatchExtensionDebugBuildFlags(proj, configGuid);
+                else
+                    SetDefaultWatchExtensionReleaseBuildFlags(proj, configGuid);
+                proj.SetBuildPropertyForConfig(configGuid, "PRODUCT_BUNDLE_IDENTIFIER", bundleId);
+                proj.SetBuildPropertyForConfig(configGuid, "INFOPLIST_FILE", infoPlistPath);
+            }
 
             proj.AddSourcesBuildPhase(newTargetGuid);
             proj.AddResourcesBuildPhase(newTargetGuid);

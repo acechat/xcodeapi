@@ -12,7 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		CCCCCCCC0000000000000006 /* PBXContainerItemProxy */ = {
+		CCCCCCCC0000000000000005 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
@@ -89,7 +89,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				CCCCCCCC0000000000000007 /* PBXTargetDependency */,
+				CCCCCCCC0000000000000006 /* PBXTargetDependency */,
 			);
 			name = "Unity-iPhone";
 			productName = "iPhone-target";
@@ -157,10 +157,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		CCCCCCCC0000000000000007 /* PBXTargetDependency */ = {
+		CCCCCCCC0000000000000006 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CCCCCCCC0000000000000003 /* TestTarget */;
-			targetProxy = CCCCCCCC0000000000000006 /* PBXContainerItemProxy */;
+			targetProxy = CCCCCCCC0000000000000005 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -177,17 +177,11 @@
 			};
 			name = Release;
 		};
-		CCCCCCCC0000000000000004 /* CustomConfig1 */ = {
+		CCCCCCCC0000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = CustomConfig1;
-		};
-		CCCCCCCC0000000000000005 /* CustomConfig2 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = CustomConfig2;
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -211,8 +205,7 @@
 		CCCCCCCC0000000000000001 /* Build configuration list for PBXNativeTarget "TestTarget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CCCCCCCC0000000000000004 /* CustomConfig1 */,
-				CCCCCCCC0000000000000005 /* CustomConfig2 */,
+				CCCCCCCC0000000000000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

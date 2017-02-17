@@ -872,7 +872,6 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="type">The type of the target. For example:
         /// "com.apple.product-type.app-extension" - App extension,
         /// "com.apple.product-type.application.watchapp2" - WatchKit 2 application</param>
-        // FIXUP: actually perform the creation of the additional configurations
         public string AddTarget(string name, string ext, string type)
         {
             var buildConfigList = XCConfigurationListData.Create();
@@ -884,6 +883,9 @@ namespace UnityEditor.iOS.Xcode
             var newTarget = PBXNativeTargetData.Create(name, productFileRef, type, buildConfigList.guid);
             nativeTargets.AddEntry(newTarget);
             project.project.targets.Add(newTarget.guid);
+
+            foreach (var buildConfigName in BuildConfigNames())
+                AddBuildConfigForTarget(newTarget.guid, buildConfigName);
             
             return newTarget.guid;
         }
@@ -926,9 +928,8 @@ namespace UnityEditor.iOS.Xcode
         }
 
         // Returns the GUID of the new configuration
-        // TODO: make private
         // targetGuid can be either native target or the project target.
-        internal string AddBuildConfigForTarget(string targetGuid, string name)
+        private string AddBuildConfigForTarget(string targetGuid, string name)
         {
             if (BuildConfigByName(targetGuid, name) != null)
             {

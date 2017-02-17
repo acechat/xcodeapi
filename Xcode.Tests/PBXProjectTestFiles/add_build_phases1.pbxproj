@@ -12,7 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CCCCCCCC0000000000000007 /* Copy resources */ = {
+		CCCCCCCC0000000000000008 /* Copy resources */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(DST_PATH)";
@@ -40,7 +40,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCCCCCCC0000000000000006 /* Frameworks */ = {
+		CCCCCCCC0000000000000007 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -109,10 +109,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CCCCCCCC0000000000000001 /* Build configuration list for PBXNativeTarget "TestTarget" */;
 			buildPhases = (
-				CCCCCCCC0000000000000004 /* Sources */,
-				CCCCCCCC0000000000000005 /* Resources */,
-				CCCCCCCC0000000000000006 /* Frameworks */,
-				CCCCCCCC0000000000000007 /* Copy resources */,
+				CCCCCCCC0000000000000005 /* Sources */,
+				CCCCCCCC0000000000000006 /* Resources */,
+				CCCCCCCC0000000000000007 /* Frameworks */,
+				CCCCCCCC0000000000000008 /* Copy resources */,
 			);
 			buildRules = (
 			);
@@ -156,7 +156,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCCCCCCC0000000000000005 /* Resources */ = {
+		CCCCCCCC0000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -174,7 +174,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCCCCCCC0000000000000004 /* Sources */ = {
+		CCCCCCCC0000000000000005 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -191,6 +191,12 @@
 			name = Release;
 		};
 		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		CCCCCCCC0000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
@@ -218,6 +224,7 @@
 		CCCCCCCC0000000000000001 /* Build configuration list for PBXNativeTarget "TestTarget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
+				CCCCCCCC0000000000000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

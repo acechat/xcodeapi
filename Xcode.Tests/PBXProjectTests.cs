@@ -562,8 +562,6 @@ namespace Unity.PureCSharpTests.iOSExtensions
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             string newTarget = proj.AddTarget("TestTarget", ".dylib", "test.type");
-            proj.AddBuildConfigForTarget(newTarget, "CustomConfig1");
-            proj.AddBuildConfigForTarget(newTarget, "CustomConfig2");
             proj.AddTargetDependency(target, newTarget);
             TestOutput(proj, "add_target1.pbxproj");
         }
@@ -586,6 +584,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
+            proj.AddBuildConfig("Debug");
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             proj.AddWatchExtension(target, "Watchtest Extension", "com.company.product.watchapp.watchextension", "Watchtest Extension/Info.plist");
             TestOutput(proj, "add_watch_extension.pbxproj");
@@ -596,6 +595,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
+            proj.AddBuildConfig("Debug");
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             string extTargetGuid = proj.AddWatchExtension(target, "watchtest Extension", "com.company.product.watchapp.watchextension", "watchtest Extension/Info.plist");
             proj.AddWatchApp(target, extTargetGuid, "watchtest", "com.company.product.watchapp", "watchtest/Info.plist");
