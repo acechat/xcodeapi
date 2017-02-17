@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor.iOS.Xcode;
 
-namespace Unity.PureCSharpTests.iOSExtensions
+namespace UnityEditor.iOS.Xcode.Tests
 {
     [TestFixture]
     public class ProjectCapabilityManagerTests : GenericTester
