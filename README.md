@@ -1,5 +1,5 @@
 Xcode Manipulation API
-========
+======================
 
 This is an Xcode Manipulation API maintained by the Unity iOS team.
 
@@ -11,3 +11,11 @@ users need to change the namespace of the API to something different to avoid co
 
 The above caveat applies to Unity 4.6 too, because it uses an older version of the API
 internally.
+
+Contribution
+============
+
+Please use name your branch other than 'stable' or 'dev' for pull requests.
+
+By doing a pull request to this repository you accept to release your code under the MIT
+license (see the LICENSE file).
