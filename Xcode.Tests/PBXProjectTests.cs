@@ -323,7 +323,7 @@ namespace UnityEditor.iOS.Xcode
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
-            proj.EnableCapability(target, PBXCapabilitiesType.GameCenter);
+            proj.EnableCapability(target, PBXCapabilityType.GameCenter);
             TestOutput(proj, "add_capability.pbxproj");
         }
         
@@ -333,7 +333,7 @@ namespace UnityEditor.iOS.Xcode
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
-            proj.EnableCapability(target, PBXCapabilitiesType.iCloud, Path.Combine(GetTestSourcePath(), "test.entitlements"));
+            proj.EnableCapability(target, PBXCapabilityType.iCloud, Path.Combine(GetTestSourcePath(), "test.entitlements"));
             TestOutput(proj, "add_capability_entitlement.pbxproj");
         }        
 

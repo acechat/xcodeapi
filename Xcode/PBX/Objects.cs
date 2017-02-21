@@ -840,7 +840,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         public string buildConfigList;
         // the name of the entitlements file required for some capabilities.
         public string entitlementsFile;
-        public List<PBXCapabilitiesType> capabilities = new List<PBXCapabilitiesType>();
+        public List<PBXCapabilityType> capabilities = new List<PBXCapabilityType>();
 
 
         public void AddReference(string productGroup, string projectRef)

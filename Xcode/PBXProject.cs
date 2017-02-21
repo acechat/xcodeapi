@@ -304,7 +304,7 @@ namespace UnityEditor.iOS.Xcode
         }
 
         // Allow user to enable a Capability
-        public bool EnableCapability(string targetGuid, PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = null, bool silentFail = false)
+        public bool EnableCapability(string targetGuid, PBXCapabilityType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = null, bool silentFail = false)
         {
             // Use the default Unity target name if none is provided
             if (targetName == null)
