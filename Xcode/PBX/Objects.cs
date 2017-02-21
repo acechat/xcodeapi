@@ -421,6 +421,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         public string buildConfigList; // guid
         public string name;
         public GUIDList dependencies;
+        public string productReference; // guid
 
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
             "buildPhases/*",
@@ -443,6 +444,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             res.SetPropertyList("buildRules", new List<string>());
             res.dependencies = new GUIDList();
             res.name = name;
+            res.productReference = productRef;
             res.SetPropertyString("productName", name);
             res.SetPropertyString("productReference", productRef);
             res.SetPropertyString("productType", productType);
@@ -453,6 +455,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             SetPropertyString("buildConfigurationList", buildConfigList);
             SetPropertyString("name", name);
+            SetPropertyString("productReference", productReference);
             SetPropertyList("buildPhases", phases);
             SetPropertyList("dependencies", dependencies);
         }
@@ -460,6 +463,7 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             buildConfigList = GetPropertyString("buildConfigurationList");
             name = GetPropertyString("name");
+            productReference = GetPropertyString("productReference");
             phases = GetPropertyList("buildPhases");
             dependencies = GetPropertyList("dependencies");
         }
@@ -539,13 +543,13 @@ namespace UnityEditor.iOS.Xcode.PBX
         public string name;
 
         // name may be null
-        public static PBXCopyFilesBuildPhaseData Create(string name, string subfolderSpec)
+        public static PBXCopyFilesBuildPhaseData Create(string name, string dstPath, string subfolderSpec)
         {
             var res = new PBXCopyFilesBuildPhaseData();
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXCopyFilesBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
-            res.SetPropertyString("dstPath", "");
+            res.SetPropertyString("dstPath", dstPath);
             res.SetPropertyString("dstSubfolderSpec", subfolderSpec);
             res.files = new List<string>();
             res.SetPropertyString("runOnlyForDeploymentPostprocessing", "0");

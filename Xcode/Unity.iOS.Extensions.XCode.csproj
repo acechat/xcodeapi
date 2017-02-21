@@ -44,6 +44,7 @@
     <Compile Include="JsonParser.cs" />
     <Compile Include="AssetCatalog.cs" />
     <Compile Include="PBXPath.cs" />
+    <Compile Include="PBXProjectExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

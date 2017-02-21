@@ -213,6 +213,19 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
+        public FileGUIDListBase BuildSectionAny(string sectionGuid)
+        {
+            if (frameworks.HasEntry(sectionGuid))
+                return frameworks[sectionGuid];
+            if (resources.HasEntry(sectionGuid))
+                return resources[sectionGuid];
+            if (sources.HasEntry(sectionGuid))
+                return sources[sectionGuid];
+            if (copyFiles.HasEntry(sectionGuid))
+                return copyFiles[sectionGuid];
+            throw new Exception(String.Format("The given GUID {0} does not refer to a known build section", sectionGuid));
+        }
+
         void RefreshBuildFilesMapForBuildFileGuidList(Dictionary<string, PBXBuildFileData> mapForTarget,
                                                       FileGUIDListBase list)
         {

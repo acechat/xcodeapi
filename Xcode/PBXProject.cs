@@ -41,61 +41,91 @@ namespace UnityEditor.iOS.Xcode
 
         // convenience accessors for public members of data. This is temporary; will be fixed by an interface change
         // of PBXProjectData
-        PBXContainerItemProxySection containerItems { get { return m_Data.containerItems; } }
-        PBXReferenceProxySection references         { get { return m_Data.references; } }
-        PBXSourcesBuildPhaseSection sources         { get { return m_Data.sources; } }
-        PBXFrameworksBuildPhaseSection frameworks   { get { return m_Data.frameworks; } }
-        PBXResourcesBuildPhaseSection resources     { get { return m_Data.resources; } }
-        PBXCopyFilesBuildPhaseSection copyFiles     { get { return m_Data.copyFiles; } }
-        PBXShellScriptBuildPhaseSection shellScripts { get { return m_Data.shellScripts; } }
-        PBXNativeTargetSection nativeTargets        { get { return m_Data.nativeTargets; } }
-        PBXTargetDependencySection targetDependencies { get { return m_Data.targetDependencies; } }
-        PBXVariantGroupSection variantGroups        { get { return m_Data.variantGroups; } }
-        XCBuildConfigurationSection buildConfigs    { get { return m_Data.buildConfigs; } }
-        XCConfigurationListSection configs          { get { return m_Data.configs; } }
-        PBXProjectSection project                   { get { return m_Data.project; } }
+        internal PBXContainerItemProxySection containerItems { get { return m_Data.containerItems; } }
+        internal PBXReferenceProxySection references         { get { return m_Data.references; } }
+        internal PBXSourcesBuildPhaseSection sources         { get { return m_Data.sources; } }
+        internal PBXFrameworksBuildPhaseSection frameworks   { get { return m_Data.frameworks; } }
+        internal PBXResourcesBuildPhaseSection resources     { get { return m_Data.resources; } }
+        internal PBXCopyFilesBuildPhaseSection copyFiles     { get { return m_Data.copyFiles; } }
+        internal PBXShellScriptBuildPhaseSection shellScripts { get { return m_Data.shellScripts; } }
+        internal PBXNativeTargetSection nativeTargets        { get { return m_Data.nativeTargets; } }
+        internal PBXTargetDependencySection targetDependencies { get { return m_Data.targetDependencies; } }
+        internal PBXVariantGroupSection variantGroups        { get { return m_Data.variantGroups; } }
+        internal XCBuildConfigurationSection buildConfigs    { get { return m_Data.buildConfigs; } }
+        internal XCConfigurationListSection configs          { get { return m_Data.configs; } }
+        internal PBXProjectSection project                   { get { return m_Data.project; } }
 
-        PBXBuildFileData BuildFilesGet(string guid) { return m_Data.BuildFilesGet(guid); }
-        void BuildFilesAdd(string targetGuid, PBXBuildFileData buildFile) { m_Data.BuildFilesAdd(targetGuid, buildFile); }
-        void BuildFilesRemove(string targetGuid, string fileGuid) { m_Data.BuildFilesRemove(targetGuid, fileGuid); }
-        PBXBuildFileData BuildFilesGetForSourceFile(string targetGuid, string fileGuid) { return m_Data.BuildFilesGetForSourceFile(targetGuid, fileGuid); }
-        IEnumerable<PBXBuildFileData> BuildFilesGetAll() { return m_Data.BuildFilesGetAll(); }
-        void FileRefsAdd(string realPath, string projectPath, PBXGroupData parent, PBXFileReferenceData fileRef) { m_Data.FileRefsAdd(realPath, projectPath, parent, fileRef); }
-        PBXFileReferenceData FileRefsGet(string guid) { return m_Data.FileRefsGet(guid); }
-        PBXFileReferenceData FileRefsGetByRealPath(string path, PBXSourceTree sourceTree) { return m_Data.FileRefsGetByRealPath(path, sourceTree); }
-        PBXFileReferenceData FileRefsGetByProjectPath(string path) { return m_Data.FileRefsGetByProjectPath(path); }
-        void FileRefsRemove(string guid) { m_Data.FileRefsRemove(guid); }
-        PBXGroupData GroupsGet(string guid) { return m_Data.GroupsGet(guid); }
-        PBXGroupData GroupsGetByChild(string childGuid) { return m_Data.GroupsGetByChild(childGuid); }
-        PBXGroupData GroupsGetMainGroup() { return m_Data.GroupsGetMainGroup(); }
-        PBXGroupData GroupsGetByProjectPath(string sourceGroup) { return m_Data.GroupsGetByProjectPath(sourceGroup); }
-        void GroupsAdd(string projectPath, PBXGroupData parent, PBXGroupData gr) { m_Data.GroupsAdd(projectPath, parent, gr); }
-        void GroupsAddDuplicate(PBXGroupData gr) { m_Data.GroupsAddDuplicate(gr); }
-        void GroupsRemove(string guid) { m_Data.GroupsRemove(guid); }
-        FileGUIDListBase BuildSectionAny(PBXNativeTargetData target, string path, bool isFolderRef) { return m_Data.BuildSectionAny(target, path, isFolderRef); }
+        internal PBXBuildFileData BuildFilesGet(string guid) { return m_Data.BuildFilesGet(guid); }
+        internal void BuildFilesAdd(string targetGuid, PBXBuildFileData buildFile) { m_Data.BuildFilesAdd(targetGuid, buildFile); }
+        internal void BuildFilesRemove(string targetGuid, string fileGuid) { m_Data.BuildFilesRemove(targetGuid, fileGuid); }
+        internal PBXBuildFileData BuildFilesGetForSourceFile(string targetGuid, string fileGuid) { return m_Data.BuildFilesGetForSourceFile(targetGuid, fileGuid); }
+        internal IEnumerable<PBXBuildFileData> BuildFilesGetAll() { return m_Data.BuildFilesGetAll(); }
+        internal void FileRefsAdd(string realPath, string projectPath, PBXGroupData parent, PBXFileReferenceData fileRef) { m_Data.FileRefsAdd(realPath, projectPath, parent, fileRef); }
+        internal PBXFileReferenceData FileRefsGet(string guid) { return m_Data.FileRefsGet(guid); }
+        internal PBXFileReferenceData FileRefsGetByRealPath(string path, PBXSourceTree sourceTree) { return m_Data.FileRefsGetByRealPath(path, sourceTree); }
+        internal PBXFileReferenceData FileRefsGetByProjectPath(string path) { return m_Data.FileRefsGetByProjectPath(path); }
+        internal void FileRefsRemove(string guid) { m_Data.FileRefsRemove(guid); }
+        internal PBXGroupData GroupsGet(string guid) { return m_Data.GroupsGet(guid); }
+        internal PBXGroupData GroupsGetByChild(string childGuid) { return m_Data.GroupsGetByChild(childGuid); }
+        internal PBXGroupData GroupsGetMainGroup() { return m_Data.GroupsGetMainGroup(); }
+        internal PBXGroupData GroupsGetByProjectPath(string sourceGroup) { return m_Data.GroupsGetByProjectPath(sourceGroup); }
+        internal void GroupsAdd(string projectPath, PBXGroupData parent, PBXGroupData gr) { m_Data.GroupsAdd(projectPath, parent, gr); }
+        internal void GroupsAddDuplicate(PBXGroupData gr) { m_Data.GroupsAddDuplicate(gr); }
+        internal void GroupsRemove(string guid) { m_Data.GroupsRemove(guid); }
+        internal FileGUIDListBase BuildSectionAny(PBXNativeTargetData target, string path, bool isFolderRef) { return m_Data.BuildSectionAny(target, path, isFolderRef); }
+        internal FileGUIDListBase BuildSectionAny(string sectionGuid) { return m_Data.BuildSectionAny(sectionGuid); }
 
-
+        /// <summary>
+        /// Returns the path to PBX project in the given Unity build path. This function can only 
+        /// be used in Unity-generated projects
+        /// </summary>
+        /// <param name="buildPath">The project build path</param>
+        /// <returns>The path to the PBX project file that can later be opened via ReadFromFile function</returns> 
         public static string GetPBXProjectPath(string buildPath)
         {
             return PBXPath.Combine(buildPath, "Unity-iPhone.xcodeproj/project.pbxproj");
         }
 
+        /// <summary>
+        /// Returns the default main target name in Unity project.
+        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName 
+        /// function. This function can only be used in Unity-generated projects.
+        /// </summary>
+        /// <returns>The default main target name.</returns>
         public static string GetUnityTargetName()
         {
             return "Unity-iPhone";
         }
 
+        /// <summary>
+        /// Returns the default test target name in Unity project.
+        /// The returned target name can then be used to retrieve the GUID of the target via TargetGuidByName 
+        /// function. This function can only be used in Unity-generated projects.
+        /// </summary>
+        /// <returns>The default test target name.</returns>
         public static string GetUnityTestTargetName()
         {
             return "Unity-iPhone Tests";
         }
 
+        /// <summary>
+        /// Returns the GUID of the project. The project GUID identifies a project-wide native target which
+        /// is used to set project-wide properties. This GUID can be passed to any functions that accepts 
+        /// target GUIDs as parameters.
+        /// </summary>
+        /// <returns>The GUID of the project.</returns>
         internal string ProjectGuid()
         {
             return project.project.guid;
         }
 
-        /// Returns a guid identifying native target with name @a name
+        /// <summary>
+        /// Returns the GUID of the native target with the given name.
+        /// In projects produced by Unity the main target can be retrieved via GetUnityTargetName function, 
+        /// whereas the test target name can be retrieved by GetUnityTestTargetName function.
+        /// </summary>
+        /// <returns>The name of the native target.</returns>
+        /// <param name="name">The GUID identifying the native target.</param>
         public string TargetGuidByName(string name)
         {
             foreach (var entry in nativeTargets.GetEntries())
@@ -104,11 +134,22 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
+        /// <summary>
+        /// Checks if files with the given extension are known to PBXProject.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if is the extension is known, <c>false</c> otherwise.</returns>
+        /// <param name="ext">The file extension (leading dot is not necessary, but accepted).</param>
         public static bool IsKnownExtension(string ext)
         {
             return FileTypeUtils.IsKnownExtension(ext);
         }
 
+        /// <summary>
+        /// Checks if files with the given extension are known to PBXProject.
+        /// Returns <c>true</c> if the extension is not known by PBXProject.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if is the extension is known, <c>false</c> otherwise.</returns>
+        /// <param name="ext">The file extension (leading dot is not necessary, but accepted).</param>
         public static bool IsBuildable(string ext)
         {
             return FileTypeUtils.IsBuildableFile(ext);
@@ -141,27 +182,34 @@ namespace UnityEditor.iOS.Xcode
             return guid;
         }
 
-        // The extension of the files identified by path and projectPath must be the same.
-        public string AddFile(string path, string projectPath)
-        {
-            return AddFileImpl(path, projectPath, PBXSourceTree.Source, false);
-        }
-
-        // sourceTree must not be PBXSourceTree.Group
-        public string AddFile(string path, string projectPath, PBXSourceTree sourceTree)
+        /// <summary>
+        /// Adds a new file reference to the list of known files.
+        /// The group structure is automatically created to correspond to the project path.
+        /// To add the file to the list of files to build, pass the returned value to [[AddFileToBuild]].
+        /// </summary>
+        /// <returns>The GUID of the added file. It can later be used to add the file for building to targets, etc.</returns>
+        /// <param name="path">The physical path to the file on the filesystem.</param>
+        /// <param name="projectPath">The project path to the file.</param>
+        /// <param name="sourceTree">The source tree the path is relative to. By default it's [[PBXSourceTree.Source]].
+        /// The [[PBXSourceTree.Group]] tree is not supported.</param>
+        public string AddFile(string path, string projectPath, PBXSourceTree sourceTree = PBXSourceTree.Source)
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
             return AddFileImpl(path, projectPath, sourceTree, false);
         }
-        
-        public string AddFolderReference(string path, string projectPath)
-        {
-            return AddFileImpl(path, projectPath, PBXSourceTree.Source, true);
-        }
-        
-        // sourceTree must not be PBXSourceTree.Group
-        public string AddFolderReference(string path, string projectPath, PBXSourceTree sourceTree)
+
+        /// <summary>
+        /// Adds a new folder reference to the list of known files.
+        /// The group structure is automatically created to correspond to the project path.
+        /// To add the folder reference to the list of files to build, pass the returned value to [[AddFileToBuild]].
+        /// </summary>
+        /// <returns>The GUID of the added folder reference. It can later be used to add the file for building to targets, etc.</returns>
+        /// <param name="path">The physical path to the folder on the filesystem.</param>
+        /// <param name="projectPath">The project path to the folder.</param>
+        /// <param name="sourceTree">The source tree the path is relative to. By default it's [[PBXSourceTree.Source]].
+        /// The [[PBXSourceTree.Group]] tree is not supported.</param>
+        public string AddFolderReference(string path, string projectPath, PBXSourceTree sourceTree = PBXSourceTree.Source)
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
@@ -184,17 +232,59 @@ namespace UnityEditor.iOS.Xcode
             }
         }
 
+        /// <summary>
+        /// Configures file for building for the given native target.
+        /// A projects containing multiple native targets, a single file or folder reference can be 
+        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// added to appropriate build section depending on the file extension.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The file guid returned by [[AddFile]] or [[AddFolderReference]].</param>
         public void AddFileToBuild(string targetGuid, string fileGuid)
         {
             AddBuildFileImpl(targetGuid, fileGuid, false, null);
         }
 
+        /// <summary>
+        /// Configures file for building for the given native target with specific compiler flags.
+        /// The function is equivalent to [[AddFileToBuild()]] except that compile flags are specified.
+        /// A projects containing multiple native targets, a single file or folder reference can be 
+        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// added to appropriate build section depending on the file extension.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The file guid returned by [[AddFile]] or [[AddFolderReference]].</param>
+        /// <param name="compileFlags">Compile flags to use.</param>
         public void AddFileToBuildWithFlags(string targetGuid, string fileGuid, string compileFlags)
         {
             AddBuildFileImpl(targetGuid, fileGuid, false, compileFlags);
         }
 
-        // returns null on error
+        /// <summary>
+        /// Configures file for building for the given native target on specific build section.
+        /// The function is equivalent to [[AddFileToBuild()]] except that specific build section is specified.
+        /// A projects containing multiple native targets, a single file or folder reference can be 
+        /// configured to be built in all, some or none of the targets. The file or folder reference is 
+        /// added to appropriate build section depending on the file extension.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="sectionGuid">The GUID of the section to add the file to.</param>
+        /// <param name="fileGuid">The file guid returned by [[AddFile]] or [[AddFolderReference]].</param>
+        public void AddFileToBuildSection(string targetGuid, string sectionGuid, string fileGuid)
+        {
+            PBXBuildFileData buildFile = PBXBuildFileData.CreateFromFile(fileGuid, false, null);
+            BuildFilesAdd(targetGuid, buildFile);
+            BuildSectionAny(sectionGuid).files.AddGUID(buildFile.guid);
+        }
+
+        /// <summary>
+        /// Returns compile flags set for the specific file.
+        /// Null is returned if the file has no configured compile flags or the file is not configured for
+        /// building on the given target.
+        /// </summary>
+        /// <returns>The compile flags for the specified file.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The GUID of the file.</param>
         // FIXME: at the moment returns all flags as the first element of the array
         public List<string> GetCompileFlagsForFile(string targetGuid, string fileGuid)
         {
@@ -206,6 +296,12 @@ namespace UnityEditor.iOS.Xcode
             return new List<string>{buildFile.compileFlags};
         }
 
+        /// <summary>
+        /// Sets the compilation flags for the given file in the given target.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The GUID of the file.</param>
+        /// <param name="compileFlags">The list of compile flags or null if the flags should be unset.</param>
         public void SetCompileFlagsForFile(string targetGuid, string fileGuid, List<string> compileFlags)
         {
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
@@ -217,6 +313,14 @@ namespace UnityEditor.iOS.Xcode
                 buildFile.compileFlags = string.Join(" ", compileFlags.ToArray());
         }
 
+        /// <summary>
+        /// Adds an asset tag for the given file.
+        /// The asset tags identify resources that will be downloaded via On Demand Resources functionality. 
+        /// A request for specific tag will initiate download of all files, configured for that tag.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The GUID of the file.</param>
+        /// <param name="tag">The name of the asset tag.</param>
         public void AddAssetTagForFile(string targetGuid, string fileGuid, string tag)
         {
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
@@ -228,6 +332,16 @@ namespace UnityEditor.iOS.Xcode
                 project.project.knownAssetTags.Add(tag);
         }
 
+        /// <summary>
+        /// Removes an asset tag for the given file.
+        /// The function does nothing if the file is not configured for building in the given target or if
+        /// the asset tag is not present in the list of asset tags configured for file. If the file was the
+        /// last file referring to the given tag across the Xcode project, then the tag is removed from the
+        /// list of known tags.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The GUID of the file.</param>
+        /// <param name="tag">The name of the asset tag.</param>
         public void RemoveAssetTagForFile(string targetGuid, string fileGuid, string tag)
         {
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
@@ -243,6 +357,12 @@ namespace UnityEditor.iOS.Xcode
             project.project.knownAssetTags.Remove(tag);
         }
 
+        /// <summary>
+        /// Adds the asset tag to the list of tags to download during initial installation.
+        /// The function does nothing if there are no files that use the given asset tag across the project.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="tag">The name of the asset tag.</param>
         public void AddAssetTagToDefaultInstall(string targetGuid, string tag)
         {
             if (!project.project.knownAssetTags.Contains(tag))
@@ -250,11 +370,25 @@ namespace UnityEditor.iOS.Xcode
             AddBuildProperty(targetGuid, "ON_DEMAND_RESOURCES_INITIAL_INSTALL_TAGS", tag);
         }
 
+        /// <summary>
+        /// Removes the asset tag from the list of tags to download during initial installation.
+        /// The function does nothing if the tag is not already configured for downloading during 
+        /// initial installation.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="tag">The name of the asset tag.</param>
         public void RemoveAssetTagFromDefaultInstall(string targetGuid, string tag)
         {
             UpdateBuildProperty(targetGuid, "ON_DEMAND_RESOURCES_INITIAL_INSTALL_TAGS", null, new[]{tag});
         }
 
+        /// <summary>
+        /// Removes an asset tag.
+        /// Removes the given asset tag from the list of configured asset tags for all files on all targets,
+        /// the list of asset tags configured for initial installation and the list of known asset tags in 
+        /// the Xcode project.
+        /// </summary>
+        /// <param name="tag">The name of the asset tag.</param>
         public void RemoveAssetTag(string tag)
         {
             foreach (var buildFile in BuildFilesGetAll())
@@ -264,12 +398,23 @@ namespace UnityEditor.iOS.Xcode
             project.project.knownAssetTags.Remove(tag);
         }
 
+        /// <summary>
+        /// Checks if the project contains a file with the given physical path.
+        /// The search is performed across all absolute source trees.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if the project contains the file, <c>false</c> otherwise.</returns>
+        /// <param name="path">The physical path of the file.</param>
         public bool ContainsFileByRealPath(string path)
         {
             return FindFileGuidByRealPath(path) != null;
         }
 
-        // sourceTree must not be PBXSourceTree.Group
+        /// <summary>
+        /// Checks if the project contains a file with the given physical path.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if the project contains the file, <c>false</c> otherwise.</returns>
+        /// <param name="path">The physical path of the file.</param>
+        /// <param name="sourceTree">The source tree path is relative to. The [[PBXSourceTree.Group]] tree is not supported.</param>
         public bool ContainsFileByRealPath(string path, PBXSourceTree sourceTree)
         {
             if (sourceTree == PBXSourceTree.Group)
@@ -277,6 +422,11 @@ namespace UnityEditor.iOS.Xcode
             return FindFileGuidByRealPath(path, sourceTree) != null;
         }
 
+        /// <summary>
+        /// Checks if the project contains a file with the given project path.
+        /// </summary>
+        /// <returns>Returns <c>true</c> if the project contains the file, <c>false</c> otherwise.</returns>
+        /// <param name="path">The project path of the file.</param>
         public bool ContainsFileByProjectPath(string path)
         {
             return FindFileGuidByProjectPath(path) != null;
@@ -287,14 +437,27 @@ namespace UnityEditor.iOS.Xcode
             return ContainsFileByRealPath("System/Library/Frameworks/" + framework);
         }
 
-        /// The framework must be specified with the '.framework' extension
+        /// <summary>
+        /// Adds a system framework dependency for the specified target.
+        /// The function assumes system frameworks are located in System/Library/Frameworks folder in the SDK source tree. 
+        /// The framework is added to Frameworks logical folder in the project.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
+        /// <param name="weak"><c>true</c> if the framework is optional (i.e. weakly linked) required, 
+        /// <c>false</c> if the framework is required.</param>
         public void AddFrameworkToProject(string targetGuid, string framework, bool weak)
         {
             string fileGuid = AddFile("System/Library/Frameworks/" + framework, "Frameworks/" + framework, PBXSourceTree.Sdk);
             AddBuildFileImpl(targetGuid, fileGuid, weak, null);
         }
 
-        /// The framework must be specified with the '.framework' extension
+        /// <summary>
+        /// Removes a system framework dependency for the specified target.
+        /// The function assumes system frameworks are located in System/Library/Frameworks folder in the SDK source tree.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="framework">The name of the framework. The extension of the filename must be ".framework".</param>
         // FIXME: targetGuid is ignored at the moment
         public void RemoveFrameworkFromProject(string targetGuid, string framework)
         {
@@ -355,7 +518,12 @@ namespace UnityEditor.iOS.Xcode
             project.project.teamIDs.Add(targetGuid, teamId);
         }
 
-        // sourceTree must not be PBXSourceTree.Group
+        /// <summary>
+        /// Finds a file with the given physical path in the project, if any.
+        /// </summary>
+        /// <returns>The GUID of the file if the search succeeded, null otherwise.</returns>
+        /// <param name="path">The physical path of the file.</param>
+        /// <param name="sourceTree">The source tree path is relative to. The [[PBXSourceTree.Group]] tree is not supported.</param>
         public string FindFileGuidByRealPath(string path, PBXSourceTree sourceTree)
         {
             if (sourceTree == PBXSourceTree.Group)
@@ -367,6 +535,12 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
+        /// <summary>
+        /// Finds a file with the given physical path in the project, if any.
+        /// The search is performed across all absolute source trees.
+        /// </summary>
+        /// <returns>The GUID of the file if the search succeeded, null otherwise.</returns>
+        /// <param name="path">The physical path of the file.</param>
         public string FindFileGuidByRealPath(string path)
         {
             path = PBXPath.FixSlashes(path);
@@ -380,6 +554,11 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
+        /// <summary>
+        /// Finds a file with the given project path in the project, if any.
+        /// </summary>
+        /// <returns>The GUID of the file if the search succeeded, null otherwise.</returns>
+        /// <param name="path">The project path of the file.</param>
         public string FindFileGuidByProjectPath(string path)
         {
             path = PBXPath.FixSlashes(path);
@@ -389,6 +568,11 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
+        /// <summary>
+        /// Removes given file from the list of files to build for the given target.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The GUID of the file or folder reference.</param>
         public void RemoveFileFromBuild(string targetGuid, string fileGuid)
         {
             var buildFile = BuildFilesGetForSourceFile(targetGuid, fileGuid);
@@ -410,6 +594,12 @@ namespace UnityEditor.iOS.Xcode
             }
         }
 
+        /// <summary>
+        /// Removes the given file from project.
+        /// The file is removed from the list of files to build for each native target and also removed 
+        /// from the list of known files.
+        /// </summary>
+        /// <param name="fileGuid">The GUID of the file or folder reference.</param>
         public void RemoveFile(string fileGuid)
         {
             if (fileGuid == null)
@@ -486,11 +676,41 @@ namespace UnityEditor.iOS.Xcode
             var res = new List<string>();
             foreach (var guid in gr.children)
             {
-                var fileRef = FileRefsGet(guid);
+                PBXFileReferenceData fileRef = FileRefsGet(guid);
                 if (fileRef != null)
                     res.Add(fileRef.name);
             }
             return res;
+        }
+
+        // Returns an empty dictionary if no group or files are found
+        internal HashSet<string> GetGroupChildrenFilesRefs(string projectPath)
+        {
+            projectPath = PBXPath.FixSlashes(projectPath);
+            PBXGroupData gr = GroupsGetByProjectPath(projectPath);
+            if (gr == null)
+                return new HashSet<string>();
+            HashSet<string> res = new HashSet<string>();
+            foreach (var guid in gr.children)
+            {
+                PBXFileReferenceData fileRef = FileRefsGet(guid);
+                if (fileRef != null)
+                    res.Add(fileRef.path);
+            }
+            return res == null ? new HashSet<string> () : res;
+        }
+
+        internal HashSet<string> GetFileRefsByProjectPaths(IEnumerable<string> paths)
+        {
+            HashSet<string> ret = new HashSet<string>();
+            foreach (string path in paths)
+            {
+                string fixedPath = PBXPath.FixSlashes(path);
+                var fileRef = FileRefsGetByProjectPath(fixedPath);
+                if (fileRef != null)
+                    ret.Add(fileRef.path);
+            }
+            return ret;
         }
 
         private PBXGroupData GetPBXGroupChildByName(PBXGroupData group, string name)
@@ -543,8 +763,13 @@ namespace UnityEditor.iOS.Xcode
             return gr;
         }
 
-        // sourceTree must not be PBXSourceTree.Group
-        public void AddExternalProjectDependency(string path, string projectPath, PBXSourceTree sourceTree)
+        /// <summary>
+        /// Adds an external project dependency to the project.
+        /// </summary>
+        /// <param name="path">The path to the external Xcode project (the .xcodeproj file).</param>
+        /// <param name="projectPath">The project path to the new project.</param>
+        /// <param name="sourceTree">The source tree the path is relative to. The [[PBXSourceTree.Group]] tree is not supported.</param>
+        internal void AddExternalProjectDependency(string path, string projectPath, PBXSourceTree sourceTree)
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
@@ -572,7 +797,7 @@ namespace UnityEditor.iOS.Xcode
             TODO: what. is remoteInfo entry in PBXContainerItemProxy? Is in referenced project name or
             referenced library name without extension?
         */
-        public void AddExternalLibraryDependency(string targetGuid, string filename, string remoteFileGuid, string projectPath,
+        internal void AddExternalLibraryDependency(string targetGuid, string filename, string remoteFileGuid, string projectPath,
                                                  string remoteInfo)
         {
             PBXNativeTargetData target = nativeTargets[targetGuid];
@@ -621,95 +846,24 @@ namespace UnityEditor.iOS.Xcode
             productGroup.children.AddGUID(libRef.guid);
         }
 
-        private void SetDefaultAppExtensionReleaseBuildFlags(XCBuildConfigurationData config, string infoPlistPath)
+        /// <summary>
+        /// Creates a new native target.
+        /// Target-specific build configurations are automatically created for each known build configuration name.
+        /// Note, that this is a requirement that follows from the structure of Xcode projects, not an implementation
+        /// detail of this function. The function creates a product file reference in the "Products" project folder 
+        /// which refers to the target artifact that is built via this target.
+        /// </summary>
+        /// <returns>The GUID of the new target.</returns>
+        /// <param name="name">The name of the new target.</param>
+        /// <param name="ext">The file extension of the target artifact (leading dot is not necessary, but accepted).</param>
+        /// <param name="type">The type of the target. For example:
+        /// "com.apple.product-type.app-extension" - App extension,
+        /// "com.apple.product-type.application.watchapp2" - WatchKit 2 application</param>
+        // FIXUP: actually perform the creation of the additional configurations
+        public string AddTarget(string name, string ext, string type)
         {
-            config.AddProperty("ALWAYS_SEARCH_USER_PATHS", "NO");
-            config.AddProperty("CLANG_CXX_LANGUAGE_STANDARD", "gnu++0x");
-            config.AddProperty("CLANG_CXX_LIBRARY", "libc++");
-            config.AddProperty("CLANG_ENABLE_MODULES", "YES");
-            config.AddProperty("CLANG_ENABLE_OBJC_ARC", "YES");
-            config.AddProperty("CLANG_WARN_BOOL_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_CONSTANT_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_DIRECT_OBJC_ISA_USAGE", "YES_ERROR");
-            config.AddProperty("CLANG_WARN_EMPTY_BODY", "YES");
-            config.AddProperty("CLANG_WARN_ENUM_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_INT_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_OBJC_ROOT_CLASS", "YES_ERROR");
-            config.AddProperty("CLANG_WARN_UNREACHABLE_CODE", "YES");
-            config.AddProperty("CLANG_WARN__DUPLICATE_METHOD_MATCH", "YES");
-            config.AddProperty("COPY_PHASE_STRIP", "YES");
-            config.AddProperty("ENABLE_NS_ASSERTIONS", "NO");
-            config.AddProperty("ENABLE_STRICT_OBJC_MSGSEND", "YES");
-            config.AddProperty("GCC_C_LANGUAGE_STANDARD", "gnu99");
-            config.AddProperty("GCC_WARN_64_TO_32_BIT_CONVERSION", "YES");
-            config.AddProperty("GCC_WARN_ABOUT_RETURN_TYPE", "YES_ERROR");
-            config.AddProperty("GCC_WARN_UNDECLARED_SELECTOR", "YES");
-            config.AddProperty("GCC_WARN_UNINITIALIZED_AUTOS", "YES_AGGRESSIVE");
-            config.AddProperty("GCC_WARN_UNUSED_FUNCTION", "YES");
-            config.AddProperty("INFOPLIST_FILE", infoPlistPath);
-            config.AddProperty("IPHONEOS_DEPLOYMENT_TARGET", "8.0");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "$(inherited)");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks");
-            config.AddProperty("MTL_ENABLE_DEBUG_INFO", "NO");
-            config.AddProperty("PRODUCT_NAME", "$(TARGET_NAME)");
-            config.AddProperty("SKIP_INSTALL", "YES");
-            config.AddProperty("VALIDATE_PRODUCT", "YES");
-        }
-
-        private void SetDefaultAppExtensionDebugBuildFlags(XCBuildConfigurationData config, string infoPlistPath)
-        {
-            config.AddProperty("ALWAYS_SEARCH_USER_PATHS", "NO");
-            config.AddProperty("CLANG_CXX_LANGUAGE_STANDARD", "gnu++0x");
-            config.AddProperty("CLANG_CXX_LIBRARY", "libc++");
-            config.AddProperty("CLANG_ENABLE_MODULES", "YES");
-            config.AddProperty("CLANG_ENABLE_OBJC_ARC", "YES");
-            config.AddProperty("CLANG_WARN_BOOL_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_CONSTANT_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_DIRECT_OBJC_ISA_USAGE", "YES_ERROR");
-            config.AddProperty("CLANG_WARN_EMPTY_BODY", "YES");
-            config.AddProperty("CLANG_WARN_ENUM_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_INT_CONVERSION", "YES");
-            config.AddProperty("CLANG_WARN_OBJC_ROOT_CLASS", "YES_ERROR");
-            config.AddProperty("CLANG_WARN_UNREACHABLE_CODE", "YES");
-            config.AddProperty("CLANG_WARN__DUPLICATE_METHOD_MATCH", "YES");
-            config.AddProperty("COPY_PHASE_STRIP", "NO");
-            config.AddProperty("ENABLE_STRICT_OBJC_MSGSEND", "YES");
-            config.AddProperty("GCC_C_LANGUAGE_STANDARD", "gnu99");
-            config.AddProperty("GCC_DYNAMIC_NO_PIC", "NO");
-            config.AddProperty("GCC_OPTIMIZATION_LEVEL", "0");
-            config.AddProperty("GCC_PREPROCESSOR_DEFINITIONS", "DEBUG=1");
-            config.AddProperty("GCC_PREPROCESSOR_DEFINITIONS", "$(inherited)");
-            config.AddProperty("GCC_SYMBOLS_PRIVATE_EXTERN", "NO");
-            config.AddProperty("GCC_WARN_64_TO_32_BIT_CONVERSION", "YES");
-            config.AddProperty("GCC_WARN_ABOUT_RETURN_TYPE", "YES_ERROR");
-            config.AddProperty("GCC_WARN_UNDECLARED_SELECTOR", "YES");
-            config.AddProperty("GCC_WARN_UNINITIALIZED_AUTOS", "YES_AGGRESSIVE");
-            config.AddProperty("GCC_WARN_UNUSED_FUNCTION", "YES");
-            config.AddProperty("INFOPLIST_FILE", infoPlistPath);
-            config.AddProperty("IPHONEOS_DEPLOYMENT_TARGET", "8.0");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "$(inherited)");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "@executable_path/Frameworks");
-            config.AddProperty("LD_RUNPATH_SEARCH_PATHS", "@executable_path/../../Frameworks");
-            config.AddProperty("MTL_ENABLE_DEBUG_INFO", "YES");
-            config.AddProperty("ONLY_ACTIVE_ARCH", "YES");
-            config.AddProperty("PRODUCT_NAME", "$(TARGET_NAME)");
-            config.AddProperty("SKIP_INSTALL", "YES");
-        }
-
-        internal PBXNativeTargetData CreateNewTarget(string name, string ext, string type)
-        {
-            // create build configurations
-            var releaseBuildConfig = XCBuildConfigurationData.Create("Release");
-            buildConfigs.AddEntry(releaseBuildConfig);
-            
-            var debugBuildConfig = XCBuildConfigurationData.Create("Debug");
-            buildConfigs.AddEntry(debugBuildConfig);
-            
             var buildConfigList = XCConfigurationListData.Create();
             configs.AddEntry(buildConfigList);
-            buildConfigList.buildConfigs.AddGUID(releaseBuildConfig.guid);
-            buildConfigList.buildConfigs.AddGUID(debugBuildConfig.guid);
             
             // create build file reference
             string fullName = name + ext;
@@ -718,55 +872,62 @@ namespace UnityEditor.iOS.Xcode
             nativeTargets.AddEntry(newTarget);
             project.project.targets.Add(newTarget.guid);
             
-            return newTarget;
-        }
-
-        // Returns the guid of the new target
-        internal string AddAppExtension(string mainTarget, string name, string infoPlistPath)
-        {
-            string ext = ".appex";
-            var newTarget = CreateNewTarget(name, ext, "com.apple.product-type.app-extension");
-            
-            SetDefaultAppExtensionReleaseBuildFlags(buildConfigs[BuildConfigByName(newTarget.guid, "Release")], infoPlistPath);
-            SetDefaultAppExtensionDebugBuildFlags(buildConfigs[BuildConfigByName(newTarget.guid, "Debug")], infoPlistPath);
-
-            var sourcesBuildPhase = PBXSourcesBuildPhaseData.Create();
-            sources.AddEntry(sourcesBuildPhase);
-            newTarget.phases.AddGUID(sourcesBuildPhase.guid);
-
-            var resourcesBuildPhase = PBXResourcesBuildPhaseData.Create();
-            resources.AddEntry(resourcesBuildPhase);
-            newTarget.phases.AddGUID(resourcesBuildPhase.guid);
-
-            var frameworksBuildPhase = PBXFrameworksBuildPhaseData.Create();
-            frameworks.AddEntry(frameworksBuildPhase);
-            newTarget.phases.AddGUID(frameworksBuildPhase.guid);
-
-            var copyFilesBuildPhase = PBXCopyFilesBuildPhaseData.Create("Embed App Extensions", "13");
-            copyFiles.AddEntry(copyFilesBuildPhase);
-            nativeTargets[mainTarget].phases.AddGUID(copyFilesBuildPhase.guid);
-
-            var containerProxy = PBXContainerItemProxyData.Create(project.project.guid, "1", newTarget.guid, name);
-            containerItems.AddEntry(containerProxy);
-
-            var targetDependency = PBXTargetDependencyData.Create(newTarget.guid, containerProxy.guid);
-            targetDependencies.AddEntry(targetDependency);
-
-            nativeTargets[mainTarget].dependencies.AddGUID(targetDependency.guid);
-
-            var buildAppCopy = PBXBuildFileData.CreateFromFile(FindFileGuidByProjectPath("Products/" + name + ext), false, "");
-            BuildFilesAdd(mainTarget, buildAppCopy);
-            copyFilesBuildPhase.files.AddGUID(buildAppCopy.guid);
-
-            AddFile(infoPlistPath, name + "/Supporting Files/Info.plist", PBXSourceTree.Source);
-
             return newTarget.guid;
         }
 
+        /// <summary>
+        /// Returns the file reference of the artifact created by building target.
+        /// </summary>
+        /// <returns>The file reference of the artifact created by building target.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string GetTargetProductFileRef(string targetGuid)
+        {
+            return nativeTargets[targetGuid].productReference;
+        }
+
+        /// <summary>
+        /// Sets up a dependency between two targets.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target that is depending on the dependency.</param>
+        /// <param name="targetDependencyGuid">The GUID of the dependency target</param>
+        internal void AddTargetDependency(string targetGuid, string targetDependencyGuid)
+        {
+            string dependencyName = nativeTargets[targetDependencyGuid].name;
+            var containerProxy = PBXContainerItemProxyData.Create(project.project.guid, "1", targetDependencyGuid, dependencyName);
+            containerItems.AddEntry(containerProxy);
+
+            var targetDependency = PBXTargetDependencyData.Create(targetDependencyGuid, containerProxy.guid);
+            targetDependencies.AddEntry(targetDependency);
+
+            nativeTargets[targetGuid].dependencies.AddGUID(targetDependency.guid);
+        }
+
+        // Returns the GUID of the new configuration
+        // TODO: make private
+        internal string AddBuildConfigForTarget(string targetGuid, string name)
+        {
+            if (BuildConfigByName(targetGuid, name) != null)
+            {
+                throw new Exception(String.Format("A build configuration by name {0} already exists for target {1}",
+                                                  targetGuid, name));
+            }
+            var buildConfig = XCBuildConfigurationData.Create(name);
+            buildConfigs.AddEntry(buildConfig);
+
+            configs[GetConfigListForTarget(targetGuid)].buildConfigs.AddGUID(buildConfig.guid);
+            return buildConfig.guid;
+        }
+
+        /// <summary>
+        /// Returns the GUID of build configuration with the given name for the specific target.
+        /// Null is returned if such configuration does not exist.
+        /// </summary>
+        /// <returns>The GUID of the build configuration or null if it does not exist.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the build configuration.</param>
         public string BuildConfigByName(string targetGuid, string name)
         {
-            PBXNativeTargetData target = nativeTargets[targetGuid];
-            foreach (string guid in configs[target.buildConfigList].buildConfigs)
+            foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
             {
                 var buildConfig = buildConfigs[guid];
                 if (buildConfig != null && buildConfig.name == name)
@@ -775,7 +936,68 @@ namespace UnityEditor.iOS.Xcode
             return null;
         }
 
-        string GetConfigListForTarget(string targetGuid)
+        /// <summary>
+        /// Creates a new sources build phase for given target.
+        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// </summary>
+        /// <returns>Returns the GUID of the new phase.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string AddSourcesBuildPhase(string targetGuid)
+        {
+            var phase = PBXSourcesBuildPhaseData.Create();
+            sources.AddEntry(phase);
+            nativeTargets[targetGuid].phases.AddGUID(phase.guid);
+            return phase.guid;
+        }
+
+        /// <summary>
+        /// Creates a new resources build phase for given target.
+        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// </summary>
+        /// <returns>Returns the GUID of the new phase.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string AddResourcesBuildPhase(string targetGuid)
+        {
+            var phase = PBXResourcesBuildPhaseData.Create();
+            resources.AddEntry(phase);
+            nativeTargets[targetGuid].phases.AddGUID(phase.guid);
+            return phase.guid;
+        }
+
+        /// <summary>
+        /// Creates a new frameworks build phase for given target.
+        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// </summary>
+        /// <returns>Returns the GUID of the new phase.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string AddFrameworksBuildPhase(string targetGuid)
+        {
+            var phase = PBXFrameworksBuildPhaseData.Create();
+            frameworks.AddEntry(phase);
+            nativeTargets[targetGuid].phases.AddGUID(phase.guid);
+            return phase.guid;
+        }
+
+        /// <summary>
+        /// Creates a new copy files build phase for given target.
+        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// </summary>
+        /// <returns>Returns the GUID of the new phase.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the phase.</param>
+        /// <param name="dstPath">The destination path.</param>
+        /// <param name="subfolderSpec">The "subfolder spec". The following usages are known:
+        /// - "13" for embedding app extension content
+        /// - "16" for embedding watch content</param>
+        public string AddCopyFilesBuildPhase(string targetGuid, string name, string dstPath, string subfolderSpec)
+        {
+            var phase = PBXCopyFilesBuildPhaseData.Create(name, dstPath, subfolderSpec);
+            copyFiles.AddEntry(phase);
+            nativeTargets[targetGuid].phases.AddGUID(phase.guid);
+            return phase.guid;
+        }
+ 
+        internal string GetConfigListForTarget(string targetGuid)
         {
             if (targetGuid == project.project.guid)
                 return project.project.buildConfigList;
@@ -790,36 +1012,83 @@ namespace UnityEditor.iOS.Xcode
             buildConfigs[configGuid].baseConfigurationReference = baseReference;
         }
 
-        // Adds an item to a build property that contains a value list. Duplicate build properties
-        // are ignored. Values for name "LIBRARY_SEARCH_PATHS" are quoted if they contain spaces.
-        // targetGuid may refer to PBXProject object
+        /// <summary>
+        /// Adds a value to build property list in all build configurations for the specified target.
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void AddBuildProperty(string targetGuid, string name, string value)
         {
             foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
                 AddBuildPropertyForConfig(guid, name, value);
         }
 
+        /// <summary>
+        /// Adds a value to build property list in all build configurations for the specified targets.
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="targetGuids">The GUIDs of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void AddBuildProperty(IEnumerable<string> targetGuids, string name, string value)
         {
             foreach (string t in targetGuids)
                 AddBuildProperty(t, name, value);
         }
+
+        /// <summary>
+        /// Adds a value to build property list of the given build configuration
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="configGuid">The GUID of the build configuration as returned by [[BuildConfigByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void AddBuildPropertyForConfig(string configGuid, string name, string value)
         {
             buildConfigs[configGuid].AddProperty(name, value);
         }
 
+        /// <summary>
+        /// Adds a value to build property list of the given build configurations
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="configGuids">The GUIDs of the build configurations as returned by [[BuildConfigByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void AddBuildPropertyForConfig(IEnumerable<string> configGuids, string name, string value)
         {
             foreach (string guid in configGuids)
                 AddBuildPropertyForConfig(guid, name, value);
         }
-        // targetGuid may refer to PBXProject object
+
+        /// <summary>
+        /// Adds a value to build property list in all build configurations for the specified target.
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void SetBuildProperty(string targetGuid, string name, string value)
         {
             foreach (string guid in configs[GetConfigListForTarget(targetGuid)].buildConfigs)
                 SetBuildPropertyForConfig(guid, name, value);
         }
+
+        /// <summary>
+        /// Adds a value to build property list in all build configurations for the specified targets.
+        /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 
+        /// "FRAMEWORK_SEARCH_PATHS" are quoted if they contain spaces.
+        /// </summary>
+        /// <param name="targetGuids">The GUIDs of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the build property.</param>
+        /// <param name="value">The value of the build property.</param>
         public void SetBuildProperty(IEnumerable<string> targetGuids, string name, string value)
         {
             foreach (string t in targetGuids)
