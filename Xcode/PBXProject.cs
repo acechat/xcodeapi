@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using UnityEditor.iOS.Xcode.PBX;
 
 namespace UnityEditor.iOS.Xcode
@@ -34,7 +33,7 @@ namespace UnityEditor.iOS.Xcode
         Build,      // The path is relative to the build products folder
         Developer,  // The path is relative to the developer folder
         Sdk         // The path is relative to the sdk folder
-    };
+    }
 
     public class PBXProject
     {
@@ -253,7 +252,7 @@ namespace UnityEditor.iOS.Xcode
 
         public void RemoveAssetTagFromDefaultInstall(string targetGuid, string tag)
         {
-            UpdateBuildProperty(targetGuid, "ON_DEMAND_RESOURCES_INITIAL_INSTALL_TAGS", null, new string[]{tag});   
+            UpdateBuildProperty(targetGuid, "ON_DEMAND_RESOURCES_INITIAL_INSTALL_TAGS", null, new[]{tag});
         }
 
         public void RemoveAssetTag(string tag)
@@ -302,6 +301,96 @@ namespace UnityEditor.iOS.Xcode
             string fileGuid = FindFileGuidByRealPath("System/Library/Frameworks/"+framework);
             if (fileGuid != null)
                 RemoveFile(fileGuid);
+        }
+
+        /// <summary>
+        /// Allow user to enable Capability,
+        /// by adding the proper id,
+        /// checking and adding the entitlements file to Code signing entitlements if needed
+        /// and adding the proper framework if required
+        /// </summary>
+        ///
+        /// <param name="capability">A PBXCapabilitiesType repesenting the capability to add</param>
+        ///
+        /// <param name="entitlementFileName">
+        /// Paramter mandatory if the capability requires an entitlement.
+        /// This file is usualy called [product name].entitlements
+        /// If this is required and it's not provided the capability will not be added.
+        /// </param>
+        ///
+        /// <param name="addOptionalFramework">
+        /// Some capabilities requires framework to be added,
+        /// and some of these capabilities requires framework to be added only for specific options (Yes! I'm looking at you iCloud).
+        /// This parameters let you define if you enabled this option.
+        /// </param>
+        ///
+        /// <param name="targetName">
+        /// The target name to find the targetGUIDbyName.
+        /// This target name should mostly never be changed.
+        /// </param>
+        ///
+        /// <returns>A bool representing if the capability has been added or not.</returns>
+        public bool EnableCapability(PBXCapabilitiesType capability, string entitlementFileName = "", bool addOptionalFramework = false, string targetName = "Unity-iPhone", bool silentFail = false)
+        {
+
+            // if the capability requires entitlements then you have to provide the name of it or we don't add the capability.
+            if (capability.RequiresEntitlements && entitlementFileName == "" || entitlementFileName == null)
+            {
+                if(!silentFail)throw new Exception("Couldn't add The iOS Capability " + capability.Id + "to the PBXProject file, because this capability requires an entitlement file.");
+                return false;
+            }
+            var p = project.project;
+            // If an entitlement with a different name was added for another capability
+            // we don't add this capacity.
+            if (p.entitlementsFile != null && entitlementFileName!= "" && p.entitlementsFile != entitlementFileName)
+            {
+                if (p.capabilities.Count > 0)
+                    if(!silentFail)throw new WarningException("Attention, it seems that you have multiple entitlements file. Only one will be added the Project : "+ p.entitlementsFile);
+                    return false;
+            }
+
+
+            // add the capability only if it doesn't already exist.
+            if (p.capabilities.Contains(capability))
+            {
+                if(!silentFail)throw new WarningException("This capability has already been added. Method ignored");
+                return false;
+            }
+
+            var targetGuid = TargetGuidByName(targetName);
+
+            p.capabilities.Add(capability);
+            p.UpdateCapabilities(targetGuid);
+            // add the required framework.
+            if (capability.Framework != "" && !capability.OptionalFramework ||
+                (capability.Framework != "" && capability.OptionalFramework && addOptionalFramework))
+            {
+                AddFrameworkToProject(targetGuid, capability.Framework, false);
+            }
+
+            // finally add the entitlement code signing if it wasn't added before.
+            if (entitlementFileName != "" && p.entitlementsFile == null)
+            {
+                p.entitlementsFile = entitlementFileName;
+                AddFileImpl(targetName +"/" + entitlementFileName,  entitlementFileName, PBXSourceTree.Source, false);
+                SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Debug"), "CODE_SIGN_ENTITLEMENTS", targetName+"/" + entitlementFileName);
+                SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Release"), "CODE_SIGN_ENTITLEMENTS", targetName+"/" + entitlementFileName);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The xcode project need a team set to be able to compile or to add some capabilities.
+        /// this method allow you to set it.
+        /// </summary>
+        /// <param name="teamId">The team id that you can find https://developer.apple.com/account/#/membership/</param>
+        /// <param name="targetName">The target name, by default with unity target name.</param>
+        public void SetTeamId(string teamId, string targetName = "Unity-iPhone")
+        {
+            var targetGuid = TargetGuidByName(targetName);
+            SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Debug"), "DEVELOPMENT_TEAM", teamId);
+            SetBuildPropertyForConfig(BuildConfigByName(targetGuid, "Release"), "DEVELOPMENT_TEAM", teamId);
+            project.project.UpdateTeamId(teamId, targetGuid);
         }
 
         // sourceTree must not be PBXSourceTree.Group
@@ -410,7 +499,6 @@ namespace UnityEditor.iOS.Xcode
                 {
                     RemoveGroupChildrenRecursive(gr);
                     GroupsRemove(gr.guid);
-                    continue;
                 }
             }
         }
@@ -728,8 +816,7 @@ namespace UnityEditor.iOS.Xcode
         {
             if (targetGuid == project.project.guid)
                 return project.project.buildConfigList;
-            else
-                return nativeTargets[targetGuid].buildConfigList;
+            return nativeTargets[targetGuid].buildConfigList;
         }
 
         // Sets the baseConfigurationReference key for a XCBuildConfiguration. 
@@ -954,5 +1041,4 @@ namespace UnityEditor.iOS.Xcode
 
         }
     }
-
 } // namespace UnityEditor.iOS.Xcode

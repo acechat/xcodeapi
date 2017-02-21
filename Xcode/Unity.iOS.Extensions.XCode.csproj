@@ -28,7 +28,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PBXCapabilitiesType.cs" />
     <Compile Include="PBXProject.cs" />
+    <Compile Include="ProjectCapabilityManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PlistParser.cs" />
     <Compile Include="PBX\Lexer.cs" />
