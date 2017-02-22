@@ -668,7 +668,7 @@ namespace Unity.PureCSharpTests.iOSExtensions
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
-            proj.AddCapability(target, PBXCapabilityType.iCloud, Path.Combine(GetTestSourcePath(), "test.entitlements"));
+            proj.AddCapability(target, PBXCapabilityType.iCloud, "test.entitlements");
             TestOutput(proj, "add_capability_entitlement.pbxproj");
         }
 
@@ -690,9 +690,9 @@ namespace Unity.PureCSharpTests.iOSExtensions
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
-            proj.AddCapability(target, PBXCapabilityType.iCloud, Path.Combine(GetTestSourcePath(), "test.entitlements"));
-            proj.AddCapability(target, PBXCapabilityType.ApplePay, Path.Combine(GetTestSourcePath(), "test.entitlements"));
-            proj.AddCapability(target, PBXCapabilityType.Siri, Path.Combine(GetTestSourcePath(), "test.entitlements"));
+            proj.AddCapability(target, PBXCapabilityType.iCloud, "test.entitlements");
+            proj.AddCapability(target, PBXCapabilityType.ApplePay, "test.entitlements");
+            proj.AddCapability(target, PBXCapabilityType.Siri, "test.entitlements");
             TestOutput(proj, "add_multiple_capabilities_entitlement.pbxproj");
         }
 
