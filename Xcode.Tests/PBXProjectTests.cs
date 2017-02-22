@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
 
-namespace Unity.PureCSharpTests.iOSExtensions
+namespace UnityEditor.iOS.Xcode.Tests
 {
     public class LinearGuidGenerator
     {

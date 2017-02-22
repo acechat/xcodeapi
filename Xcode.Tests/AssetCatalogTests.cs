@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor.iOS.Xcode;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityEditor.iOS.Xcode.Tests
 {
 
     [TestFixture]

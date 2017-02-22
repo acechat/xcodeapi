@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Linq;
 
-namespace UnityEditor.iOS.Xcode
+namespace UnityEditor.iOS.Xcode.Tests
 {
     public class GenericTester
     {
